@@ -7,6 +7,7 @@ export const WorkoutLog = () => {
   const [exercises, setExercises] = useState([])
   const [selectedExercise, setSelectedExercise] = useState("0")
   const [selectedMuscleGroup, setSelectedMuscleGroup] = useState("0");
+  const [workoutName, setWorkoutName] = useState("")
 
   const fetchAllMuscleGroups = async () => {
     try {
@@ -37,6 +38,17 @@ export const WorkoutLog = () => {
     <>
       <div className="muscleGroup-container">
         <h2>Log Workout</h2>
+        <fieldset className="users-workout">
+                <div >
+                    <label>Workout Name</label>
+                    <input
+                        type="text"
+                        name="Workout-Name"
+                        value={workoutName}
+                        onChange={(event) => setWorkoutName(event.target.value)}
+                        required />
+                </div>
+            </fieldset>
         <div className="muscleGroup-dropdown">
           <select
             id="muscle-group"
@@ -73,6 +85,9 @@ export const WorkoutLog = () => {
 
 
         <button className="add-exercise-btn">Add Exercise</button>
+
+
+        <button className="save-workout-btn">Save Workout</button>
       </div>
     </>
   );
