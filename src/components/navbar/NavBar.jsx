@@ -10,6 +10,12 @@ export const NavBar = () => {
             <li>
                 <Link to="/workoutLog" className="navbar-link">Workout Log</Link>
             </li>
+            <li>
+                <Link to="/communityFeed" className="navbar-link">Community Feed</Link>
+            </li>
+            <li>
+                <Link to="/profile" className="navbar-link">Profile</Link>
+            </li>
 
             {localStorage.getItem("users_user") ? (
                 <li>

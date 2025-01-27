@@ -2,6 +2,8 @@ import { Outlet, Route, Routes } from "react-router-dom"
 import { useEffect, useState } from "react"
 import { NavBar } from "../components/navbar/NavBar"
 import { WorkoutLog } from "../components/WorkoutLog/WorkoutLog"
+import { CommunityFeed } from "../components/CommunityFeed/CommunityFeed"
+import { Profile } from "../components/Profile/Profile"
 
 
 
@@ -27,6 +29,12 @@ export const ApplicationViews = () => {
             }>
                <Route path="workoutLog">
                     <Route index element={<WorkoutLog currentUser={currentUser} />} />
+                </Route>
+                <Route path="communityFeed">
+                    <Route index element={<CommunityFeed currentUser={currentUser} />} />
+                </Route>
+                <Route path="profile">
+                    <Route index element={<Profile currentUser={currentUser} />} />
                 </Route>
             </Route>
         </Routes>
