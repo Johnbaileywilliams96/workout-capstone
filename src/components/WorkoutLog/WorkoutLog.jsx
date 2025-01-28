@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { getMuscleGroup } from "../services/muscleGroupService";
 import { getExercises } from "../services/exerciseService";
 import "./Workout.css";
-import { addSets } from "../services/setsService";
+import { addSets, deleteSet } from "../services/setsService";
 
 export const WorkoutLog = ({ currentUser }) => {
   const [muscleGroup, setMuscleGroup] = useState([]);
@@ -12,7 +12,7 @@ export const WorkoutLog = ({ currentUser }) => {
   const [workoutName, setWorkoutName] = useState("");
   const [workoutWeight, setWorkoutWeight] = useState(0);
   const [repNumber, setRepNumber] = useState(0);
- 
+  const [loggedSets, setLoggedSets] = useState([]);
 
   const fetchAllMuscleGroups = async () => {
     try {
@@ -46,15 +46,51 @@ export const WorkoutLog = ({ currentUser }) => {
     setRepNumber((prev) => (prev > 0 ? prev - 1 : 0));
   };
 
-  const handleAddedSet = (event) => {
+  const handleAddedSet = async (event) => {
     event.preventDefault();
 
-    const newUserSet = {
-      reps: repNumber,
-      weight: parseInt(workoutWeight),
-    };
-    if (repNumber && workoutWeight) {
-      return addSets(newUserSet);
+    if (repNumber && workoutWeight && selectedExercise !== "0") {
+      const newUserSet = {
+        exerciseName:
+          exercises.find((ex) => ex.id === parseInt(selectedExercise))?.name ||
+          "Unknown Exercise",
+        reps: repNumber,
+        weight: parseInt(workoutWeight),
+        setOrder: loggedSets.length + 1,
+      };
+
+      try {
+        // First, add the set to the database
+        await addSets(newUserSet);
+
+        // If database update is successful, update the local state
+        setLoggedSets((prevSets) => [...prevSets, newUserSet]);
+
+        // Reset the input fields for the next set
+        setRepNumber(0);
+        setWorkoutWeight(0);
+      } catch (error) {
+        console.error("Error adding set to database:", error);
+      }
+    }
+  };
+  const handleDeleteSet = async (setOrder) => {
+    try {
+      // First delete from database
+      await deleteSet(setOrder);
+      
+      // Then update local state
+      setLoggedSets(prevSets => prevSets.filter(set => set.setOrder !== setOrder));
+      
+      // Optionally reorder remaining sets
+      setLoggedSets(prevSets => 
+        prevSets.map((set, index) => ({
+          ...set,
+          setOrder: index + 1
+        }))
+      );
+    } catch (error) {
+      console.error("Error deleting set:", error);
     }
   };
   return (
@@ -125,7 +161,7 @@ export const WorkoutLog = ({ currentUser }) => {
 
           <fieldset className="users-weight">
             <div>
-              <label>weight(ibs)</label>
+              <label>weight (ibs)</label>
               <input
                 type="text"
                 name="Workout-Name"
@@ -140,6 +176,16 @@ export const WorkoutLog = ({ currentUser }) => {
             + set
           </button>
         </div>
+        <div className="logged-sets">
+  {loggedSets.map((set) => (
+    <div key={set.setOrder} className="set-box">
+      <button onClick={() => handleDeleteSet(set.setOrder)}>Delete</button>
+      <span>{set.exerciseName}</span>
+      <span>Reps: {set.reps}</span>
+      <span>Weight: {set.weight}</span>
+    </div>
+  ))}
+</div>
 
         <button className="add-exercise-btn">Add Exercise</button>
 

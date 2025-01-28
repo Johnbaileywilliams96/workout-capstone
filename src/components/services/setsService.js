@@ -13,3 +13,9 @@ export const getSets = () => {
         body: JSON.stringify(set),
     }).then((res) => res.json())
 }
+
+export const deleteSet = async (set) => {
+    return fetch(`http://localhost:8088/sets/${set}`, {
+        method: "DELETE"
+    })
+}
