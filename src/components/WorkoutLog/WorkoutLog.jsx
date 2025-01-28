@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { getMuscleGroup } from "../services/muscleGroupService";
 import { getExercises } from "../services/exerciseService";
+import "./Workout.css"
 
 export const WorkoutLog = () => {
   const [muscleGroup, setMuscleGroup] = useState([]);
@@ -37,7 +38,7 @@ export const WorkoutLog = () => {
   return (
     <>
       <div className="muscleGroup-container">
-        <h2>Log Workout</h2>
+        <h2 className="workout-h2">Log Workout</h2>
         <fieldset className="users-workout">
                 <div >
                     <label>Workout Name</label>
