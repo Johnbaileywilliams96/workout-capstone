@@ -67,6 +67,8 @@ export const WorkoutLog = () => {
           </select>
         </div>
 
+        <div className="exercise-selection">
+
         <div className="exercise-dropdown">
           <select
             id="exercise-group"
@@ -83,6 +85,11 @@ export const WorkoutLog = () => {
             })}
           </select>
         </div>
+
+          <button>+ set</button>
+
+        </div>
+
 
 
         <button className="add-exercise-btn">Add Exercise</button>
