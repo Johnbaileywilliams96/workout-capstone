@@ -3,150 +3,144 @@
     margin: 2rem auto;
     padding: 2rem;
     background-color: #ffffff;
-    border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
-
-.workout-h2 {
-    color: #333;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .workout-h2 {
+    color: #2c3e50;
     text-align: center;
     margin-bottom: 2rem;
     font-size: 2rem;
-    font-weight: bold;
-}
-
-.users-workout {
-    border: none;
-    margin-bottom: 2rem;
-}
-
-.users-workout div {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-}
-
-.users-workout label {
     font-weight: 600;
-    color: #444;
-    font-size: 1rem;
-}
-
-.users-workout input {
-    padding: 0.75rem;
-    border: 2px solid #e2e8f0;
-    border-radius: 6px;
-    font-size: 1rem;
-    transition: border-color 0.2s ease;
-    color: #4a5568;
-}
-
-.users-workout input::placeholder {
-    color: #a0aec0;
-}
-
-.users-workout input:focus {
-    outline: none;
-    border-color: #4299e1;
-    box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
-}
-
-.muscleGroup-dropdown,
-.exercise-dropdown {
+  }
+  
+  .users-workout, .users-reps, .users-weight {
+    border: none;
     margin-bottom: 1.5rem;
-}
-
-select {
+    padding: 0;
+  }
+  
+  .users-workout input,
+  .users-weight input,
+  select {
     width: 100%;
-    padding: 0.75rem;
-    border: 2px solid #e2e8f0;
+    padding: 0.8rem;
+    border: 1px solid #dcdfe6;
     border-radius: 6px;
     font-size: 1rem;
+    margin-top: 0.5rem;
+    transition: border-color 0.3s ease;
     background-color: white;
-    cursor: pointer;
-    appearance: none;
-    color: #4a5568;
-}
-
-select option[value="0"] {
-    color: #a0aec0;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 0.75rem center;
-    background-size: 1em;
-}
-
-select:focus {
+    color: #2c3e50;
+  }
+  
+  .users-workout input:focus,
+  .users-weight input:focus,
+  select:focus {
     outline: none;
-    border-color: #4299e1;
-    box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
-}
-
-.add-exercise-btn,
-.save-workout-btn {
+    border-color: #3498db;
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+  }
+  
+  label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #4a5568;
+    font-weight: 500;
+  }
+  
+  .muscleGroup-dropdown,
+  .exercise-dropdown {
+    margin-bottom: 1.5rem;
+  }
+  
+  .exercise-selection {
+    background-color: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    border: 1px solid #e2e8f0;
+  }
+  
+  .reps-counter {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 0.5rem;
+  }
+  
+  .reps-counter button {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    width: 32px;
+    height: 32px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+  
+  .reps-counter button:hover {
+    background-color: #2980b9;
+  }
+  
+  .reps-counter span {
+    font-size: 1.8rem;
+    font-weight: 600;
+    min-width: 50px;
+    text-align: center;
+    color: #2c3e50;
+    background-color: #e9ecef;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+  
+  .add-exercise-btn,
+  .save-workout-btn {
     width: 100%;
-    padding: 0.75rem;
+    padding: 1rem;
     border: none;
     border-radius: 6px;
     font-size: 1rem;
-    font-weight: 600;
+    font-weight: 500;
     cursor: pointer;
     transition: all 0.2s ease;
-}
-
-.add-exercise-btn {
-    background-color: #48bb78;
+  }
+  
+  .add-exercise-btn {
+    background-color: #2ecc71;
     color: white;
     margin-bottom: 1rem;
-}
-
-.add-exercise-btn:hover {
-    background-color: #38a169;
-}
-
-.save-workout-btn {
-    background-color: #4299e1;
+  }
+  
+  .add-exercise-btn:hover {
+    background-color: #27ae60;
+  }
+  
+  .save-workout-btn {
+    background-color: #3498db;
     color: white;
-}
-
-.save-workout-btn:hover {
-    background-color: #3182ce;
-}
-button:focus {
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.5);
-}
-
-@media (max-width: 640px) {
+  }
+  
+  .save-workout-btn:hover {
+    background-color: #2980b9;
+  }
+  
+  /* Responsive design */
+  @media (max-width: 768px) {
     .muscleGroup-container {
-        margin: 1rem;
-        padding: 1rem;
+      margin: 1rem;
+      padding: 1rem;
     }
-
-    h2 {
-        font-size: 1.5rem;
-        margin-bottom: 1.5rem;
+  
+    .workout-h2 {
+      font-size: 1.5rem;
     }
-
-    select,
-    input,
-    button {
-        padding: 0.6rem;
-        font-size: 0.95rem;
+  
+    .exercise-selection {
+      padding: 1rem;
     }
-}
-
-@keyframes slideIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.muscleGroup-container {
-    animation: slideIn 0.3s ease-out;
-}
+  }
