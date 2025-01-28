@@ -3,6 +3,7 @@ import { getMuscleGroup } from "../services/muscleGroupService";
 import { getExercises } from "../services/exerciseService";
 import "./Workout.css";
 import { addSets, deleteSet } from "../services/setsService";
+import { addWorkout } from "../services/getWorkout";
 
 export const WorkoutLog = ({ currentUser }) => {
   const [muscleGroup, setMuscleGroup] = useState([]);
@@ -72,6 +73,44 @@ export const WorkoutLog = ({ currentUser }) => {
       } catch (error) {
         console.error("Error adding set to database:", error);
       }
+    }
+  };
+
+  const handleSaveWorkout = async () => {
+    // Check if we have a workout name and at least one set
+    if (!workoutName.trim()) {
+      alert("Please enter a workout name");
+      return;
+    }
+    
+    if (loggedSets.length === 0) {
+      alert("Please add at least one set to your workout");
+      return;
+    }
+  
+    try {
+      const workoutData = {
+        title: workoutName,
+        sets: loggedSets,
+        muscleGroup: muscleGroup,
+        userId: currentUser.id, // Assuming currentUser has an id property
+        date: new Date().toISOString()
+      };
+  
+      await addWorkout(workoutData);
+      
+      // Clear the form after successful save
+      setWorkoutName("");
+      setLoggedSets([]);
+      setSelectedExercise("0");
+      setSelectedMuscleGroup("0");
+      setRepNumber(0);
+      setWorkoutWeight(0);
+      
+      alert("Workout saved successfully!");
+    } catch (error) {
+      console.error("Error saving workout:", error);
+      alert("Failed to save workout. Please try again.");
     }
   };
   const handleDeleteSet = async (setOrder) => {
@@ -164,7 +203,7 @@ export const WorkoutLog = ({ currentUser }) => {
               <label>weight (ibs)</label>
               <input
                 type="text"
-                name="Workout-Name"
+                title="Workout-Name"
                 value={workoutWeight}
                 onChange={(event) => setWorkoutWeight(event.target.value)}
                 required
@@ -187,9 +226,8 @@ export const WorkoutLog = ({ currentUser }) => {
   ))}
 </div>
 
-        <button className="add-exercise-btn">Add Exercise</button>
-
-        <button className="save-workout-btn">Save Workout</button>
+        <button className="save-workout-btn"
+        onClick={handleSaveWorkout}>Save Workout</button>
       </div>
     </>
   );

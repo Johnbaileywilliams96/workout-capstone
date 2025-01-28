@@ -18,3 +18,4 @@ export const addWorkout = async (workout) => {
       body: JSON.stringify(workout),
   }).then((res) => res.json())
 }
+
