@@ -52,17 +52,19 @@ export const WorkoutLog = ({ currentUser }) => {
 
     if (repNumber && workoutWeight && selectedExercise !== "0") {
       const newUserSet = {
-        exerciseName: exercises.find((ex) => ex.id === parseInt(selectedExercise))?.name || "Unknown Exercise",
+        exerciseName:
+          exercises.find((ex) => ex.id === parseInt(selectedExercise))?.name ||
+          "Unknown Exercise",
         reps: repNumber,
         weight: parseInt(workoutWeight),
         setOrder: loggedSets.length + 1,
-        date: new Date().toISOString()
+        date: new Date().toISOString(),
       };
 
       try {
         // Get the response from addSets which should include the ID
         const savedSet = await addSets(newUserSet);
-        
+
         // Add the set with its new ID to the local state
         setLoggedSets((prevSets) => [...prevSets, savedSet]);
 
@@ -80,7 +82,7 @@ export const WorkoutLog = ({ currentUser }) => {
       alert("Please enter a workout name");
       return;
     }
-    
+
     if (loggedSets.length === 0) {
       alert("Please add at least one set to your workout");
       return;
@@ -91,17 +93,17 @@ export const WorkoutLog = ({ currentUser }) => {
       alert("Please select a muscle group");
       return;
     }
-  
+
     try {
       const workoutData = {
         title: workoutName,
         muscleGroup: selectedMuscleGroup, // Use selectedMuscleGroup instead of muscleGroup
         userId: currentUser.id,
-        dateCompleted: new Date().toISOString()
+        dateCompleted: new Date().toISOString(),
       };
-  
+
       await addWorkout(workoutData);
-      
+
       // Clear the form after successful save
       setWorkoutName("");
       setLoggedSets([]);
@@ -109,7 +111,7 @@ export const WorkoutLog = ({ currentUser }) => {
       setSelectedMuscleGroup("0");
       setRepNumber(0);
       setWorkoutWeight(0);
-      
+
       alert("Workout saved successfully!");
     } catch (error) {
       console.error("Error saving workout:", error);
@@ -119,15 +121,17 @@ export const WorkoutLog = ({ currentUser }) => {
   const handleDeleteSet = async (set) => {
     try {
       await deleteSet(set.id);
-      
+
       // Fix the filter to compare the current set with the one to delete
-      setLoggedSets(prevSets => prevSets.filter(s => s.setOrder !== set.setOrder));
-      
+      setLoggedSets((prevSets) =>
+        prevSets.filter((s) => s.setOrder !== set.setOrder)
+      );
+
       // Optionally reorder remaining sets
-      setLoggedSets(prevSets => 
+      setLoggedSets((prevSets) =>
         prevSets.map((s, index) => ({
           ...s,
-          setOrder: index + 1
+          setOrder: index + 1,
         }))
       );
     } catch (error) {
@@ -218,18 +222,19 @@ export const WorkoutLog = ({ currentUser }) => {
           </button>
         </div>
         <div className="logged-sets">
-  {loggedSets.map((set) => (
-    <div key={set.setOrder} className="set-box">
-      <button onClick={() => handleDeleteSet(set)}>Delete</button>
-      <span>{set.exerciseName}</span>
-      <span>Reps: {set.reps}</span>
-      <span>Weight: {set.weight}</span>
-    </div>
-  ))}
-</div>
+          {loggedSets.map((set) => (
+            <div key={set.setOrder} className="set-box">
+              <button onClick={() => handleDeleteSet(set)}>Delete</button>
+              <span>{set.exerciseName}</span>
+              <span>Reps: {set.reps}</span>
+              <span>Weight: {set.weight}</span>
+            </div>
+          ))}
+        </div>
 
-        <button className="save-workout-btn"
-        onClick={handleSaveWorkout}>Save Workout</button>
+        <button className="save-workout-btn" onClick={handleSaveWorkout}>
+          Save Workout
+        </button>
       </div>
     </>
   );

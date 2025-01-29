@@ -5,10 +5,10 @@
   }
   
   .Profile-container h2 {
-    color:#fff;
-    font-size: 3rem;
-    margin-bottom: 2rem;
     text-align: center;
+    color: #333;
+    margin-bottom: 2rem;
+    font-size: 2rem;
   }
   
   .Profile-grid {
@@ -18,26 +18,53 @@
   }
   
   .Profile-item {
-    background-color: #fff;
+    background: white;
     border-radius: 8px;
     padding: 1.5rem;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s ease-in-out;
-  }
-  
-  .Profile-item:hover {
-    transform: translateY(-5px);
   }
   
   .Profile-item p {
     margin: 0.5rem 0;
-    color: #666;
-    font-size: 1.1rem;
+    line-height: 1.5;
   }
   
   .Profile-item p:first-child {
+    font-weight: bold;
     color: #333;
-    font-weight: 600;
+  }
+  
+  .Workouts-section, .Likes-section {
+    background: white;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .Workouts-section h3, .Likes-section h3 {
+    color: #333;
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 0.5rem;
+  }
+  
+  .Workout-item, .likes-item {
+    background: #f8f9fa;
+    border-radius: 6px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    transition: transform 0.2s ease;
+  }
+  
+  .Workout-item:hover, .likes-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  }
+  
+  .Workout-item p, .likes-item p {
+    margin: 0.25rem 0;
+    color: #555;
   }
   
   /* Responsive adjustments */
@@ -45,12 +72,21 @@
     .Profile-container {
       padding: 1rem;
     }
-    
-    .Profile-container h2 {
-      font-size: 1.75rem;
+  
+    .Profile-grid {
+      grid-template-columns: 1fr;
     }
-    
-    .Profile-item {
+  
+    .Profile-item, .Workouts-section, .Likes-section {
       padding: 1rem;
     }
+  }
+  
+  /* Optional: Add smooth scrolling for the whole page */
+  html {
+    scroll-behavior: smooth;
+  }
+
+  .email {
+    color: #333;
   }

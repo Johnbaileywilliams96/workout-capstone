@@ -27,6 +27,7 @@ export const ApplicationViews = () => {
                     <Outlet />
                 </>
             }>
+                <Route index element={<WorkoutLog currentUser={currentUser} />} />
                <Route path="workoutLog">
                     <Route index element={<WorkoutLog currentUser={currentUser} />} />
                 </Route>

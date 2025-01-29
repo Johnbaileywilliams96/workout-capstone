@@ -20,7 +20,7 @@ export const Profile = ({ currentUser }) => {
       const likesArray = await getLikes();
 
       const currentUserLikes = likesArray
-        .filter((like) => like.post?.userId === currentUser.id)
+        .filter((like) => like.userId === currentUser.id)
         .map((like) => {
           // Find the full post data from workoutArray using postId
           const fullPost = workoutArray.find(
@@ -48,7 +48,7 @@ export const Profile = ({ currentUser }) => {
       console.error("Error fetching likes:", error);
     }
   };
-
+  console.log(cUser)
   useEffect(() => {
     fetchAllUsersWorkouts();
   }, []);
@@ -60,7 +60,7 @@ export const Profile = ({ currentUser }) => {
         {cUser.map((user) => (
           <div key={user.id} className="Profile-item">
             <p>Name: {user.name}</p>
-            <p>Email: {user.email}</p>
+            <p className="email">Email: {user.email}</p>
           </div>
         ))}
         <div className="Workouts-section">
@@ -68,6 +68,7 @@ export const Profile = ({ currentUser }) => {
           {userWorkouts.map((workout) => (
             <div key={workout.id} className="Workout-item">
               <p>Workout Type: {workout.title}</p>
+              <p>Description: {workout.muscleGroup?.description}</p>
               <p>Date: {workout.dateCompleted}</p>
             </div>
           ))}
@@ -77,6 +78,8 @@ export const Profile = ({ currentUser }) => {
           {userLikes.map((like) => (
             <div key={like.id} className="likes-item">
               <p>{like.post?.title}</p>
+              <p>{like.post?.dateCompleted}</p>
+              <p>{like.post?.muscleGroup.description}</p>
             </div>
           ))}
         </div>
