@@ -87,14 +87,19 @@ export const WorkoutLog = ({ currentUser }) => {
       alert("Please add at least one set to your workout");
       return;
     }
+
+    // Check if a muscle group is selected
+    if (selectedMuscleGroup === "0") {
+      alert("Please select a muscle group");
+      return;
+    }
   
     try {
       const workoutData = {
         title: workoutName,
-        sets: loggedSets,
-        muscleGroup: muscleGroup,
-        userId: currentUser.id, // Assuming currentUser has an id property
-        date: new Date().toISOString()
+        muscleGroup: selectedMuscleGroup, // Use selectedMuscleGroup instead of muscleGroup
+        userId: currentUser.id,
+        dateCompleted: new Date().toISOString()
       };
   
       await addWorkout(workoutData);
