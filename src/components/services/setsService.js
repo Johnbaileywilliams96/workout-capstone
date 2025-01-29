@@ -14,8 +14,15 @@ export const getSets = () => {
     }).then((res) => res.json())
 }
 
-export const deleteSet = async (set) => {
-    return fetch(`http://localhost:8088/sets/${set}`, {
-        method: "DELETE"
-    })
-}
+export const deleteSet = async (id) => {
+    const response = await fetch(`http://localhost:8088/sets/${id}`, {
+        method: 'DELETE',
+        headers: {
+            "Content-Type": "application/json"
+        }
+    });
+    
+    if (!response.ok) {
+        throw new Error('Failed to delete set');
+    }
+};

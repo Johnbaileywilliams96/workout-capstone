@@ -52,22 +52,20 @@ export const WorkoutLog = ({ currentUser }) => {
 
     if (repNumber && workoutWeight && selectedExercise !== "0") {
       const newUserSet = {
-        exerciseName:
-          exercises.find((ex) => ex.id === parseInt(selectedExercise))?.name ||
-          "Unknown Exercise",
+        exerciseName: exercises.find((ex) => ex.id === parseInt(selectedExercise))?.name || "Unknown Exercise",
         reps: repNumber,
         weight: parseInt(workoutWeight),
         setOrder: loggedSets.length + 1,
+        date: new Date().toISOString()
       };
 
       try {
-        // First, add the set to the database
-        await addSets(newUserSet);
+        // Get the response from addSets which should include the ID
+        const savedSet = await addSets(newUserSet);
+        
+        // Add the set with its new ID to the local state
+        setLoggedSets((prevSets) => [...prevSets, savedSet]);
 
-        // If database update is successful, update the local state
-        setLoggedSets((prevSets) => [...prevSets, newUserSet]);
-
-        // Reset the input fields for the next set
         setRepNumber(0);
         setWorkoutWeight(0);
       } catch (error) {
@@ -118,18 +116,17 @@ export const WorkoutLog = ({ currentUser }) => {
       alert("Failed to save workout. Please try again.");
     }
   };
-  const handleDeleteSet = async (setOrder) => {
+  const handleDeleteSet = async (set) => {
     try {
-      // First delete from database
-      await deleteSet(setOrder);
+      await deleteSet(set.id);
       
-      // Then update local state
-      setLoggedSets(prevSets => prevSets.filter(set => set.setOrder !== setOrder));
+      // Fix the filter to compare the current set with the one to delete
+      setLoggedSets(prevSets => prevSets.filter(s => s.setOrder !== set.setOrder));
       
       // Optionally reorder remaining sets
       setLoggedSets(prevSets => 
-        prevSets.map((set, index) => ({
-          ...set,
+        prevSets.map((s, index) => ({
+          ...s,
           setOrder: index + 1
         }))
       );
@@ -223,7 +220,7 @@ export const WorkoutLog = ({ currentUser }) => {
         <div className="logged-sets">
   {loggedSets.map((set) => (
     <div key={set.setOrder} className="set-box">
-      <button onClick={() => handleDeleteSet(set.setOrder)}>Delete</button>
+      <button onClick={() => handleDeleteSet(set)}>Delete</button>
       <span>{set.exerciseName}</span>
       <span>Reps: {set.reps}</span>
       <span>Weight: {set.weight}</span>
