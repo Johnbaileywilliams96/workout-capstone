@@ -3,3 +3,4 @@ export const getExercises = () => {
       res.json()
     )
   }
+

@@ -3,7 +3,7 @@ import { getMuscleGroup } from "../services/muscleGroupService";
 import { getExercises } from "../services/exerciseService";
 import "./Workout.css";
 import { addSets, deleteSet } from "../services/setsService";
-import { addWorkout } from "../services/getWorkout";
+import { addWorkout, addWorkoutExercise, getWorkoutExercises } from "../services/getWorkout";
 import { addPosts } from "../services/postService";
 
 export const WorkoutLog = ({ currentUser }) => {
@@ -15,6 +15,7 @@ export const WorkoutLog = ({ currentUser }) => {
   const [workoutWeight, setWorkoutWeight] = useState(0);
   const [repNumber, setRepNumber] = useState(0);
   const [loggedSets, setLoggedSets] = useState([]);
+  const [workoutExercises, setWorkoutExercises] = useState([])
 
   const fetchAllMuscleGroups = async () => {
     try {
@@ -23,6 +24,10 @@ export const WorkoutLog = ({ currentUser }) => {
 
       const exercisesArray = await getExercises();
       setExercises(exercisesArray);
+
+      const workoutExerciseArray = await getWorkoutExercises();
+      setWorkoutExercises(workoutExerciseArray)
+
     } catch (error) {
       console.error("Error fetching liked posts:", error);
     }
@@ -77,61 +82,40 @@ export const WorkoutLog = ({ currentUser }) => {
     }
   };
 
-  const handlePostWorkout = async () => {
-    if (!workoutName.trim()) {
-      alert("Please enter a workout name");
-      return;
-    }
-    if (loggedSets.length === 0) {
-      alert("Please add at least one set to your workout");
-      return;
-    }
-    if (selectedMuscleGroup === "0") {
-      alert("Please select a muscle group");
-      return;
-    }
-
+  const handleCompleteWorkout = async () => {
     try {
-      const postData = {
-        userId: currentUser.id,
-        content: workoutName,
-        createdAt: new Date().toISOString(),
-      };
-      await addPosts(postData)
-    } catch (error) {
-      console.error("Error posting workout:", error);
-      alert("Failed to save workout. Please try again.");
-    }
-  }
-
-  const handleSaveWorkout = async () => {
-    // Check if we have a workout name and at least one set
-    if (!workoutName.trim()) {
-      alert("Please enter a workout name");
-      return;
-    }
-
-    if (loggedSets.length === 0) {
-      alert("Please add at least one set to your workout");
-      return;
-    }
-
-    // Check if a muscle group is selected
-    if (selectedMuscleGroup === "0") {
-      alert("Please select a muscle group");
-      return;
-    }
-
-    try {
+      // 1. Save the workout first to get its ID
       const workoutData = {
         title: workoutName,
-        muscleGroupId: selectedMuscleGroup, // Use selectedMuscleGroup instead of muscleGroup
+        muscleGroupId: parseInt(selectedMuscleGroup),
         userId: currentUser.id,
         dateCompleted: new Date().toISOString(),
       };
-
-      await addWorkout(workoutData);
-
+      const savedWorkout = await addWorkout(workoutData);
+      
+      // 2. Create the post
+      const postData = {
+        userId: currentUser.id,
+        content: workoutName,
+        workoutId: savedWorkout.id,
+        createdAt: new Date().toISOString(),
+      };
+      await addPosts(postData);
+      
+      // 3. Create workout exercise entries for each unique exercise in the sets
+      const uniqueExercises = [...new Set(loggedSets.map(set => set.exerciseName))];
+      for (const exerciseName of uniqueExercises) {
+        const exercise = exercises.find(ex => ex.name === exerciseName);
+        if (exercise) {
+          const exerciseWorkoutData = {
+            workoutId: savedWorkout.id, // You'll need to modify your addWorkout function to return the saved workout
+            exerciseId: exercise.id,
+            order: workoutExercises.length + 1
+          };
+          await addWorkoutExercise(exerciseWorkoutData);
+        }
+      }
+  
       // Clear the form after successful save
       setWorkoutName("");
       setLoggedSets([]);
@@ -139,7 +123,7 @@ export const WorkoutLog = ({ currentUser }) => {
       setSelectedMuscleGroup("0");
       setRepNumber(0);
       setWorkoutWeight(0);
-
+  
       alert("Workout saved successfully!");
     } catch (error) {
       console.error("Error saving workout:", error);
@@ -260,7 +244,7 @@ export const WorkoutLog = ({ currentUser }) => {
           ))}
         </div>
 
-        <button className="save-workout-btn" onClick={handleSaveWorkout, handlePostWorkout}>
+        <button className="save-workout-btn" onClick={handleCompleteWorkout}>
           Save Workout
         </button>
       </div>

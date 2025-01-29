@@ -9,6 +9,16 @@ export const getWorkout = () => {
     )
 }
 
+export const addWorkoutExercise = async (workout) => {
+  return fetch("http://localhost:8088/workoutExercise", {
+      method: "POST",
+      headers: {
+          "Content-Type": "application/json",
+      },
+      body: JSON.stringify(workout),
+  }).then((res) => res.json())
+}
+
 export const addWorkout = async (workout) => {
   return fetch("http://localhost:8088/workouts", {
       method: "POST",
