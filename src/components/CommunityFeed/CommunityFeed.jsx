@@ -8,7 +8,6 @@ import { createLike, getLikes, deleteLike } from "../services/likesService";
 export const CommunityFeed = ({ currentUser }) => {
   const [allPosts, setAllPosts] = useState([]);
   const [userLikes, setUserLikes] = useState([]);
-  // const [workoutExercise, setWorkoutExercises] = useState([]);
 
   const fetchAllPosts = async () => {
     try {

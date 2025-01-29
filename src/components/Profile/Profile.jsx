@@ -3,6 +3,7 @@ import "./Profile.css";
 import { getUser } from "../services/userService";
 import { getWorkout } from "../services/getWorkout";
 import { getLikes } from "../services/likesService";
+import { deleteMyPost } from "../services/postService";
 
 export const Profile = ({ currentUser }) => {
   const [allUsers, setAllUsers] = useState([]);
@@ -48,14 +49,23 @@ export const Profile = ({ currentUser }) => {
       console.error("Error fetching likes:", error);
     }
   };
-  console.log(cUser)
+  const handleDeletePost = async (postId) => {
+    try {
+      await deleteMyPost(postId);
+      // Update the userWorkouts state by filtering out the deleted post
+      setUserWorkouts(userWorkouts.filter(workout => workout.id !== postId));
+    } catch (error) {
+      console.error("Error deleting post:", error);
+    }
+  };
+
   useEffect(() => {
     fetchAllUsersWorkouts();
   }, [currentUser.id]);
 
   return (
     <div className="Profile-container">
-      <h2>Profile</h2>
+      <h2 className="profile-title">Profile</h2>
       <div className="Profile-grid">
         {cUser.map((user) => (
           <div key={user.id} className="Profile-item">
@@ -70,6 +80,12 @@ export const Profile = ({ currentUser }) => {
               <p>Workout Type: {workout.title}</p>
               <p>Description: {workout.muscleGroup?.description}</p>
               <p>Date: {workout.dateCompleted}</p>
+              <button
+                className="delete-button"
+                onClick={() => handleDeletePost(workout.id)}
+              >
+                Delete Post
+              </button>
             </div>
           ))}
         </div>

@@ -4,6 +4,7 @@ import { getExercises } from "../services/exerciseService";
 import "./Workout.css";
 import { addSets, deleteSet } from "../services/setsService";
 import { addWorkout } from "../services/getWorkout";
+import { addPosts } from "../services/postService";
 
 export const WorkoutLog = ({ currentUser }) => {
   const [muscleGroup, setMuscleGroup] = useState([]);
@@ -58,7 +59,7 @@ export const WorkoutLog = ({ currentUser }) => {
         reps: repNumber,
         weight: parseInt(workoutWeight),
         setOrder: loggedSets.length + 1,
-        date: new Date().toISOString(),
+        createdAt: new Date().toISOString(),
       };
 
       try {
@@ -75,6 +76,33 @@ export const WorkoutLog = ({ currentUser }) => {
       }
     }
   };
+
+  const handlePostWorkout = async () => {
+    if (!workoutName.trim()) {
+      alert("Please enter a workout name");
+      return;
+    }
+    if (loggedSets.length === 0) {
+      alert("Please add at least one set to your workout");
+      return;
+    }
+    if (selectedMuscleGroup === "0") {
+      alert("Please select a muscle group");
+      return;
+    }
+
+    try {
+      const postData = {
+        userId: currentUser.id,
+        content: workoutName,
+        createdAt: new Date().toISOString(),
+      };
+      await addPosts(postData)
+    } catch (error) {
+      console.error("Error posting workout:", error);
+      alert("Failed to save workout. Please try again.");
+    }
+  }
 
   const handleSaveWorkout = async () => {
     // Check if we have a workout name and at least one set
@@ -97,7 +125,7 @@ export const WorkoutLog = ({ currentUser }) => {
     try {
       const workoutData = {
         title: workoutName,
-        muscleGroup: selectedMuscleGroup, // Use selectedMuscleGroup instead of muscleGroup
+        muscleGroupId: selectedMuscleGroup, // Use selectedMuscleGroup instead of muscleGroup
         userId: currentUser.id,
         dateCompleted: new Date().toISOString(),
       };
@@ -232,7 +260,7 @@ export const WorkoutLog = ({ currentUser }) => {
           ))}
         </div>
 
-        <button className="save-workout-btn" onClick={handleSaveWorkout}>
+        <button className="save-workout-btn" onClick={handleSaveWorkout, handlePostWorkout}>
           Save Workout
         </button>
       </div>
