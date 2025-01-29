@@ -51,7 +51,7 @@ export const Profile = ({ currentUser }) => {
   console.log(cUser)
   useEffect(() => {
     fetchAllUsersWorkouts();
-  }, []);
+  }, [currentUser.id]);
 
   return (
     <div className="Profile-container">
