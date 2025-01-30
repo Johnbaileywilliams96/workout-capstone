@@ -55,6 +55,13 @@ export const WorkoutLog = ({ currentUser }) => {
 
   const handleAddedSet = async (event) => {
     event.preventDefault();
+    const formatDate = (date) => {
+      const d = new Date(date);
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      const year = d.getFullYear();
+      return `${year}-${month}-${day}`;
+    };
 
     if (repNumber && workoutWeight && selectedExercise !== "0") {
       const newUserSet = {
@@ -64,7 +71,7 @@ export const WorkoutLog = ({ currentUser }) => {
         reps: repNumber,
         weight: parseInt(workoutWeight),
         setOrder: loggedSets.length + 1,
-        createdAt: new Date().toISOString(),
+        createdAt: formatDate(new Date()),
       };
 
       try {
@@ -84,12 +91,19 @@ export const WorkoutLog = ({ currentUser }) => {
 
   const handleCompleteWorkout = async () => {
     try {
+      const formatDate = (date) => {
+        const d = new Date(date);
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+      };
       // 1. Save the workout first to get its ID
       const workoutData = {
         title: workoutName,
         muscleGroupId: parseInt(selectedMuscleGroup),
         userId: currentUser.id,
-        dateCompleted: new Date().toISOString(),
+        dateCompleted: formatDate(new Date()),
       };
       const savedWorkout = await addWorkout(workoutData);
       
@@ -98,7 +112,7 @@ export const WorkoutLog = ({ currentUser }) => {
         userId: currentUser.id,
         content: workoutName,
         workoutId: savedWorkout.id,
-        createdAt: new Date().toISOString(),
+        createdAt: formatDate(new Date()),
       };
       await addPosts(postData);
       

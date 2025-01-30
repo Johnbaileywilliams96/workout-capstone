@@ -5,9 +5,16 @@ import { createUser, getUserByEmail } from "../services/userService";
 // import { createUser, getUserByEmail } from "../../services/userService";
 
 export const Register = (props) => {
+    const formatDate = (date) => {
+        const d = new Date(date);
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+      };
     const [user, setUser] = useState({
         email: "",
-        date: new Date()
+        date: formatDate(new Date())
     });
     let navigate = useNavigate();
 

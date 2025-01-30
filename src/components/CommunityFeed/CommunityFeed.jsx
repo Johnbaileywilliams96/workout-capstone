@@ -26,6 +26,7 @@ export const CommunityFeed = ({ currentUser }) => {
       console.error("Error fetching likes:", error);
     }
   };
+// need to get a function that provides exercise details of workout
 
   const handleLikeToggle = async (postId) => {
     try {
@@ -80,7 +81,7 @@ export const CommunityFeed = ({ currentUser }) => {
       <div className="community-feed-container">
         {allPosts.map((post) => {
           const liked = isPostLiked(post.id);
-          const likesCount = getPostLikesCount(post.id);
+          const likesCount = getPostLikesCount(post.id)
           
           return (
             <div key={post.id} className="post-ticket">

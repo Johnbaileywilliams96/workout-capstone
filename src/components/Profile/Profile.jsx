@@ -3,13 +3,20 @@ import "./Profile.css";
 import { getUser } from "../services/userService";
 import { getWorkout } from "../services/getWorkout";
 import { getLikes } from "../services/likesService";
-import { deleteMyPost } from "../services/postService";
+import { deleteMyPost, updatePost } from "../services/postService";
 
 export const Profile = ({ currentUser }) => {
   const [allUsers, setAllUsers] = useState([]);
   const [cUser, setCUser] = useState([]);
   const [userWorkouts, setUserWorkouts] = useState([]);
   const [userLikes, setUserLikes] = useState([]);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editingWorkoutId, setEditingWorkoutId] = useState(null);
+  const [editedWorkout, setEditedWorkout] = useState({
+    title: "",
+    muscleGroupId: null,
+    dateCompleted: ""
+  });
 
   const fetchAllUsersWorkouts = async () => {
     try {
@@ -19,6 +26,8 @@ export const Profile = ({ currentUser }) => {
       const workoutArray = await getWorkout();
 
       const likesArray = await getLikes();
+
+      console.log(workoutArray)
 
       const currentUserLikes = likesArray
         .filter((like) => like.userId === currentUser.id)
@@ -49,6 +58,84 @@ export const Profile = ({ currentUser }) => {
       console.error("Error fetching likes:", error);
     }
   };
+
+ 
+
+  const handleEdit = (workout) => {
+    setIsEditing(true);
+    setEditingWorkoutId(workout.id);
+    setEditedWorkout({
+      title: workout.title,
+      muscleGroupId: workout.muscleGroup?.id,
+      dateCompleted: workout.dateCompleted
+    });
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    if (name === "muscleGroupId") {
+      setEditedWorkout(prev => ({
+        ...prev,
+        muscleGroup: parseInt(value)
+      }));
+    } else {
+      setEditedWorkout(prev => ({
+        ...prev,
+        [name]: value
+      }));
+    }
+  };
+  const handleCancelEdit = () => {
+    setIsEditing(false);
+    setEditingWorkoutId(null);
+    setEditedWorkout({
+      title: "",
+      muscleGroupId: null,
+      dateCompleted: ""
+    });
+  };
+
+  const handleUpdatePost = async () => {
+    try {
+      // Create the updated post object
+      const updatedPost = {
+        id: editingWorkoutId,
+        title: editedWorkout.title,
+        muscleGroup: editedWorkout.muscleGroupId,
+        dateCompleted: editedWorkout.dateCompleted,
+        userId: currentUser.id  // Make sure to include this if your API needs it
+      };
+    
+      // Wait for the API response
+      const updatedData = await updatePost(editingWorkoutId, updatedPost);
+    
+      // Update local state with the response from the server
+      setUserWorkouts(prevWorkouts =>
+        prevWorkouts.map(workout =>
+          workout.id === editingWorkoutId
+            ? updatedData  // Use the actual response from the server
+            : workout
+        )
+      );
+  
+      // Or alternatively, refetch all workouts
+      await fetchAllUsersWorkouts();
+      
+      // Reset editing state
+      setIsEditing(false);
+      setEditingWorkoutId(null);
+      setEditedWorkout({
+        title: "",
+        muscleGroup: { description: "" },
+        dateCompleted: ""
+      });
+    } catch (error) {
+      console.error("Error updating post:", error);
+      alert("Failed to update post. Please try again.");
+    }
+  };
+
+
   const handleDeletePost = async (postId) => {
     try {
       await deleteMyPost(postId);
@@ -62,6 +149,16 @@ export const Profile = ({ currentUser }) => {
   useEffect(() => {
     fetchAllUsersWorkouts();
   }, [currentUser.id]);
+
+  // useEffect(() => {
+  //   getPostByPostId(postId).then((data) => {
+  //     const singlePost = data[0];
+  //     if (singlePost) {
+  //       setPost(singlePost);
+  //       setEditedPost(singlePost);
+  //     }
+  //   });
+  // }, [postId]);
 
   return (
     <div className="Profile-container">
@@ -77,15 +174,68 @@ export const Profile = ({ currentUser }) => {
           <h3>Your Workouts</h3>
           {userWorkouts.map((workout) => (
             <div key={workout.id} className="Workout-item">
-              <p>Workout Type: {workout.title}</p>
-              <p>Description: {workout.muscleGroup?.description}</p>
-              <p>Date: {workout.dateCompleted}</p>
-              <button
-                className="delete-button"
-                onClick={() => handleDeletePost(workout.id)}
-              >
-                Delete Post
-              </button>
+
+              {isEditing && editingWorkoutId === workout.id ? (
+                <div className="edit-post">
+                    <input
+                    type="text"
+                    name="title"
+                    value={editedWorkout.title}
+                    onChange={handleInputChange}
+                    placeholder="Workout Type"
+                    className="title-edit"
+                  />
+                    <input
+                      type="number"
+                      name="muscleGroupId"
+                      value={editedWorkout.muscleGroupId || ''}
+                      onChange={handleInputChange}
+                      placeholder="Muscle Group ID"
+                      className="edit-description"
+                    />
+                   <input
+                    type="date"
+                    name="dateCompleted"
+                    value={editedWorkout.dateCompleted}
+                    onChange={handleInputChange}
+                    className="edit-date"
+                  />
+                   <div className="post-update">
+                    <button 
+                      onClick={handleUpdatePost}
+                      className="update-post"
+                    >
+                      Save Changes
+                    </button>
+                    <button 
+                      onClick={handleCancelEdit}
+                      className="cancel-button"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <p className="workout-title">Workout Type: {workout.title}</p>
+                  <p className="workout-description">Description: {workout.muscleGroup?.description}</p>
+                  <p className="workout-date">Date: {workout.dateCompleted}</p>
+                  <div className="buttons">
+                    <button
+                      onClick={() => handleEdit(workout)}
+                      className="edit-post-button"
+                    >
+                      Edit Post
+                    </button>
+                    <button
+                      onClick={() => handleDeletePost(workout.id)}
+                      className="edit-delete-button"
+                    >
+                      Delete Post
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
           ))}
         </div>
