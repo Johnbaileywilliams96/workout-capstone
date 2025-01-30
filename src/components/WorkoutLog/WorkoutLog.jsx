@@ -81,11 +81,13 @@ export const WorkoutLog = ({ currentUser }) => {
         setOrder: loggedSets.length + 1,
         createdAt: formatDate(new Date()),
       };
-
+      
+      
       if (repNumber && workoutWeight && selectedExercise !== "0") {
         const newWorkoutExercise = {
-          exerciseId: parseInt(selectedExercise),
           workoutId: parseInt(),
+          exerciseId: parseInt(selectedExercise),
+          order: loggedSets.length + 1,
         };
         await addWorkoutExercise(newWorkoutExercise);
       }
