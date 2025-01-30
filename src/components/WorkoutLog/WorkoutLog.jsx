@@ -3,7 +3,11 @@ import { getMuscleGroup } from "../services/muscleGroupService";
 import { getExercises } from "../services/exerciseService";
 import "./Workout.css";
 import { addSets, deleteSet } from "../services/setsService";
-import { addWorkout, addWorkoutExercise, getWorkoutExercises } from "../services/getWorkout";
+import {
+  addWorkout,
+  addWorkoutExercise,
+  getWorkoutExercises,
+} from "../services/getWorkout";
 import { addPosts } from "../services/postService";
 
 export const WorkoutLog = ({ currentUser }) => {
@@ -15,7 +19,7 @@ export const WorkoutLog = ({ currentUser }) => {
   const [workoutWeight, setWorkoutWeight] = useState(0);
   const [repNumber, setRepNumber] = useState(0);
   const [loggedSets, setLoggedSets] = useState([]);
-  const [workoutExercises, setWorkoutExercises] = useState([])
+  const [workoutExercises, setWorkoutExercises] = useState([]);
 
   const fetchAllMuscleGroups = async () => {
     try {
@@ -26,12 +30,14 @@ export const WorkoutLog = ({ currentUser }) => {
       setExercises(exercisesArray);
 
       const workoutExerciseArray = await getWorkoutExercises();
-      setWorkoutExercises(workoutExerciseArray)
+      setWorkoutExercises(workoutExerciseArray);
 
+      console.log(workoutExerciseArray);
     } catch (error) {
       console.error("Error fetching liked posts:", error);
     }
   };
+
   useEffect(() => {
     fetchAllMuscleGroups();
   }, []);
@@ -45,6 +51,7 @@ export const WorkoutLog = ({ currentUser }) => {
     const exerciseId = event.target.value;
     setSelectedExercise(exerciseId);
   };
+
   const incrementReps = () => {
     setRepNumber((prev) => prev + 1);
   };
@@ -57,8 +64,8 @@ export const WorkoutLog = ({ currentUser }) => {
     event.preventDefault();
     const formatDate = (date) => {
       const d = new Date(date);
-      const month = String(d.getMonth() + 1).padStart(2, '0');
-      const day = String(d.getDate()).padStart(2, '0');
+      const month = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
       const year = d.getFullYear();
       return `${year}-${month}-${day}`;
     };
@@ -68,12 +75,20 @@ export const WorkoutLog = ({ currentUser }) => {
         exerciseName:
           exercises.find((ex) => ex.id === parseInt(selectedExercise))?.name ||
           "Unknown Exercise",
+        exerciseId: parseInt(selectedExercise),
         reps: repNumber,
         weight: parseInt(workoutWeight),
         setOrder: loggedSets.length + 1,
         createdAt: formatDate(new Date()),
       };
 
+      if (repNumber && workoutWeight && selectedExercise !== "0") {
+        const newWorkoutExercise = {
+          exerciseId: parseInt(selectedExercise),
+          workoutId: parseInt(),
+        };
+        await addWorkoutExercise(newWorkoutExercise);
+      }
       try {
         // Get the response from addSets which should include the ID
         const savedSet = await addSets(newUserSet);
@@ -94,8 +109,8 @@ export const WorkoutLog = ({ currentUser }) => {
       const formatDate = (date) => {
         const d = new Date(date);
         const year = d.getFullYear();
-        const month = String(d.getMonth() + 1).padStart(2, '0');
-        const day = String(d.getDate()).padStart(2, '0');
+        const month = String(d.getMonth() + 1).padStart(2, "0");
+        const day = String(d.getDate()).padStart(2, "0");
         return `${year}-${month}-${day}`;
       };
       // 1. Save the workout first to get its ID
@@ -106,7 +121,7 @@ export const WorkoutLog = ({ currentUser }) => {
         dateCompleted: formatDate(new Date()),
       };
       const savedWorkout = await addWorkout(workoutData);
-      
+
       // 2. Create the post
       const postData = {
         userId: currentUser.id,
@@ -115,21 +130,23 @@ export const WorkoutLog = ({ currentUser }) => {
         createdAt: formatDate(new Date()),
       };
       await addPosts(postData);
-      
+
       // 3. Create workout exercise entries for each unique exercise in the sets
-      const uniqueExercises = [...new Set(loggedSets.map(set => set.exerciseName))];
+      const uniqueExercises = [
+        ...new Set(loggedSets.map((set) => set.exerciseName)),
+      ];
       for (const exerciseName of uniqueExercises) {
-        const exercise = exercises.find(ex => ex.name === exerciseName);
+        const exercise = exercises.find((ex) => ex.name === exerciseName);
         if (exercise) {
           const exerciseWorkoutData = {
             workoutId: savedWorkout.id, // You'll need to modify your addWorkout function to return the saved workout
             exerciseId: exercise.id,
-            order: workoutExercises.length + 1
+            order: workoutExercises.length + 1,
           };
           await addWorkoutExercise(exerciseWorkoutData);
         }
       }
-  
+
       // Clear the form after successful save
       setWorkoutName("");
       setLoggedSets([]);
@@ -137,7 +154,7 @@ export const WorkoutLog = ({ currentUser }) => {
       setSelectedMuscleGroup("0");
       setRepNumber(0);
       setWorkoutWeight(0);
-  
+
       alert("Workout saved successfully!");
     } catch (error) {
       console.error("Error saving workout:", error);
