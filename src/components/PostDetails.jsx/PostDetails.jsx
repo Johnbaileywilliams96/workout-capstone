@@ -1,8 +1,13 @@
 import { useEffect, useState } from "react";
 import { createLike, deleteLike, getLikes } from "../services/likesService";
 import { useParams } from "react-router-dom";
-import { deletePost, getPostByPostId, updatePost } from "../services/postService";
-import "./PostDetails.css"
+import {
+  deletePost,
+  getPostByPostId,
+  updatePost,
+} from "../services/postService";
+import "./PostDetails.css";
+import { getMuscleGroup } from "../services/muscleGroupService";
 
 export const PostDetails = ({ currentUser }) => {
   const { postId } = useParams();
@@ -11,9 +16,15 @@ export const PostDetails = ({ currentUser }) => {
   const [postLikes, setPostLikes] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
   const [editedPost, setEditedPost] = useState({});
+  const [muscleGroups, setMuscleGroups] = useState([])
 
   const hasUserLiked = postLikes.some((like) => like.userId === currentUser.id);
   const isPostOwner = post.userId === currentUser.id;
+  
+  const getMuscleGroupName = (muscleGroupId) => {
+    const muscleGroup = muscleGroups.find(mg => mg.id === muscleGroupId);
+    return muscleGroup ? muscleGroup.name : 'Unknown';
+  };
 
   const fetchAllLikes = async () => {
     getLikes().then((likesArray) => {
@@ -24,6 +35,17 @@ export const PostDetails = ({ currentUser }) => {
       setPostLikes(currentPostLikes);
     });
   };
+  useEffect(() => {
+    const fetchMuscleGroups = async () => {
+      try {
+        const muscleGroupsData = await getMuscleGroup();
+        setMuscleGroups(muscleGroupsData);
+      } catch (error) {
+        console.error("Error fetching muscle groups:", error);
+      }
+    };
+    fetchMuscleGroups();
+  }, []);
 
   const handleEdit = () => {
     setIsEditing(true);
@@ -136,13 +158,15 @@ export const PostDetails = ({ currentUser }) => {
           </>
         ) : (
           <>
-            <div>
+          <div>
               <span className="post-info">Workout: </span>
               {post.workout?.title}
             </div>
             <div>
               <span className="post-info">Muscle Group: </span>
-              {post.workout?.muscleGroupId}
+              {post.workout?.muscleGroupId ? 
+                getMuscleGroupName(post.workout.muscleGroupId) 
+                : 'Not specified'}
             </div>
             <div>
               <span className="post-info">Content: </span>
@@ -164,7 +188,9 @@ export const PostDetails = ({ currentUser }) => {
                 {hasUserLiked ? "Unlike" : "Like"}
               </button>
               {isPostOwner && <button onClick={handleEdit}>Edit Post</button>}
-                {isPostOwner && <button onClick={handleDeletePost}>Delete</button>}
+              {isPostOwner && (
+                <button onClick={handleDeletePost}>Delete</button>
+              )}
             </div>
           </>
         )}

@@ -9,8 +9,10 @@ import {
   getWorkoutExercises,
 } from "../services/getWorkout";
 import { addPosts } from "../services/postService";
+import { useNavigate } from "react-router-dom";
 
 export const WorkoutLog = ({ currentUser }) => {
+  const navigate = useNavigate();
   const [muscleGroup, setMuscleGroup] = useState([]);
   const [exercises, setExercises] = useState([]);
   const [selectedExercise, setSelectedExercise] = useState("0");
@@ -33,7 +35,7 @@ export const WorkoutLog = ({ currentUser }) => {
       const workoutExerciseArray = await getWorkoutExercises();
       setWorkoutExercises(workoutExerciseArray);
     } catch (error) {
-      console.error("Error fetching liked posts:", error);
+      console.error("Error fetching data:", error);
     }
   };
 
@@ -59,6 +61,14 @@ export const WorkoutLog = ({ currentUser }) => {
     setRepNumber((prev) => (prev > 0 ? prev - 1 : 0));
   };
 
+  const formatDate = (date) => {
+    const d = new Date(date);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+
   const handleAddedSet = async (event) => {
     event.preventDefault();
 
@@ -67,13 +77,15 @@ export const WorkoutLog = ({ currentUser }) => {
       return;
     }
 
-    const formatDate = (date) => {
-      const d = new Date(date);
-      const year = d.getFullYear();
-      const month = String(d.getMonth() + 1).padStart(2, "0");
-      const day = String(d.getDate()).padStart(2, "0");
-      return `${year}-${month}-${day}`;
-    };
+    if (selectedMuscleGroup === "0") {
+      alert("Please select a muscle group");
+      return;
+    }
+
+    if (selectedExercise === "0") {
+      alert("Please select an exercise");
+      return;
+    }
 
     try {
       // Create workout if doesn't exist
@@ -107,53 +119,37 @@ export const WorkoutLog = ({ currentUser }) => {
 
       const savedSet = await addSets(newUserSet);
       setLoggedSets((prev) => [...prev, savedSet]);
+
+      // Reset the rep and weight inputs after adding a set
+      setRepNumber(0);
+      setWorkoutWeight(0);
     } catch (error) {
       console.error("Error adding set:", error);
+      alert("Failed to add set. Please try again.");
     }
   };
 
   const handleCompleteWorkout = async () => {
     try {
-      const formatDate = (date) => {
-        const d = new Date(date);
-        const year = d.getFullYear();
-        const month = String(d.getMonth() + 1).padStart(2, "0");
-        const day = String(d.getDate()).padStart(2, "0");
-        return `${year}-${month}-${day}`;
-      };
-      // 1. Save the workout first to get its ID
-      const workoutData = {
-        title: workoutName,
-        muscleGroupId: parseInt(selectedMuscleGroup),
-        userId: currentUser.id,
-        dateCompleted: formatDate(new Date()),
-      };
-      const savedWorkout = await addWorkout(workoutData);
+      // Only create post using the existing workout
+      if (!currentWorkout) {
+        alert("No workout has been started. Please add at least one set first.");
+        return;
+      }
 
-      // 2. Create the post
+      if (loggedSets.length === 0) {
+        alert("Please add at least one set before saving the workout.");
+        return;
+      }
+
+      // Create the post
       const postData = {
         userId: currentUser.id,
         content: workoutName,
-        workoutId: savedWorkout.id,
+        workoutId: currentWorkout.id,
         createdAt: formatDate(new Date()),
       };
       await addPosts(postData);
-
-      // 3. Create workout exercise entries for each unique exercise in the sets
-      const uniqueExercises = [
-        ...new Set(loggedSets.map((set) => set.exerciseName)),
-      ];
-      for (const exerciseName of uniqueExercises) {
-        const exercise = exercises.find((ex) => ex.name === exerciseName);
-        if (exercise) {
-          const exerciseWorkoutData = {
-            workoutId: savedWorkout.id, // You'll need to modify your addWorkout function to return the saved workout
-            exerciseId: exercise.id,
-            order: workoutExercises.length + 1,
-          };
-          await addWorkoutExercise(exerciseWorkoutData);
-        }
-      }
 
       // Clear the form after successful save
       setWorkoutName("");
@@ -162,6 +158,9 @@ export const WorkoutLog = ({ currentUser }) => {
       setSelectedMuscleGroup("0");
       setRepNumber(0);
       setWorkoutWeight(0);
+      setCurrentWorkout(null);
+
+      navigate("/communityFeed");
 
       alert("Workout saved successfully!");
     } catch (error) {
@@ -175,9 +174,11 @@ export const WorkoutLog = ({ currentUser }) => {
       await deleteSet(setId);
       setLoggedSets(loggedSets.filter((set) => set.id !== setId));
     } catch (error) {
-      console.error("Error deleting post:", error);
+      console.error("Error deleting set:", error);
+      alert("Failed to delete set. Please try again.");
     }
   };
+
   return (
     <>
       <div className="muscleGroup-container">
@@ -200,14 +201,12 @@ export const WorkoutLog = ({ currentUser }) => {
             value={selectedMuscleGroup}
             onChange={handleMuscleGroupChange}
           >
-            <option value="0">MuscleGroup</option>$
-            {muscleGroup.map((group) => {
-              return (
-                <option value={group.id} key={group.id}>
-                  {group.name}
-                </option>
-              );
-            })}
+            <option value="0">MuscleGroup</option>
+            {muscleGroup.map((group) => (
+              <option value={group.id} key={group.id}>
+                {group.name}
+              </option>
+            ))}
           </select>
         </div>
 
@@ -218,14 +217,12 @@ export const WorkoutLog = ({ currentUser }) => {
               value={selectedExercise}
               onChange={handleExerciseChange}
             >
-              <option value="0">Exercises</option>$
-              {exercises.map((exercise) => {
-                return (
-                  <option value={exercise.id} key={exercise.id}>
-                    {exercise.name}
-                  </option>
-                );
-              })}
+              <option value="0">Exercises</option>
+              {exercises.map((exercise) => (
+                <option value={exercise.id} key={exercise.id}>
+                  {exercise.name}
+                </option>
+              ))}
             </select>
           </div>
 
@@ -246,10 +243,10 @@ export const WorkoutLog = ({ currentUser }) => {
 
           <fieldset className="users-weight">
             <div>
-              <label>weight (ibs)</label>
+              <label>Weight (lbs)</label>
               <input
                 type="text"
-                title="Workout-Name"
+                title="Workout-Weight"
                 value={workoutWeight}
                 onChange={(event) => setWorkoutWeight(event.target.value)}
                 required
@@ -258,9 +255,10 @@ export const WorkoutLog = ({ currentUser }) => {
           </fieldset>
 
           <button type="button" onClick={handleAddedSet}>
-            + set
+            + Set
           </button>
         </div>
+
         <div className="logged-sets">
           {loggedSets.map((set) => (
             <div key={set.id} className="set-box">
