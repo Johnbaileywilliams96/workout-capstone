@@ -4,6 +4,7 @@ import { getPosts } from "../services/postService";
 // import { getUser } from "../services/userService";
 import "./CommunityFeed.css";
 import { createLike, getLikes, deleteLike } from "../services/likesService";
+import { Link } from "react-router-dom";
 
 export const CommunityFeed = ({ currentUser }) => {
   const [allPosts, setAllPosts] = useState([]);
@@ -85,7 +86,9 @@ export const CommunityFeed = ({ currentUser }) => {
             <div key={post.id} className="post-ticket">
               <p>{post.user?.name}</p>
               <p>{post.content}</p>
-              <h2 className="h2-communityFeed">{post.workout?.title}</h2>
+              <Link to={`/postDetails/${post.id}`} key={post.id}>
+              <h2 className="h2-communityFeed">Title: {post.workout?.title}</h2>
+              </Link>
               <p className="likes-count">Likes: {likesCount}</p>
               <button
                 className={`like-button ${liked ? "liked" : ""}`}

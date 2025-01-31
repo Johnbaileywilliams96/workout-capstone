@@ -3,7 +3,7 @@ import "./Profile.css";
 import { getUser } from "../services/userService";
 import { getWorkout } from "../services/getWorkout";
 import { getLikes } from "../services/likesService";
-import { deleteMyWorkouts, updatePost } from "../services/postService";
+import { deleteMyWorkouts, updateWorkout } from "../services/postService";
 
 export const Profile = ({ currentUser }) => {
   const [allUsers, setAllUsers] = useState([]);
@@ -105,7 +105,7 @@ export const Profile = ({ currentUser }) => {
       };
     
       // Wait for the API response
-      const updatedData = await updatePost(editingWorkoutId, updatedPost);
+      const updatedData = await updateWorkout(editingWorkoutId, updatedPost);
     
       // Update local state with the response from the server
       setUserWorkouts(prevWorkouts =>
@@ -132,11 +132,11 @@ export const Profile = ({ currentUser }) => {
   };
 
 
-  const handleDeleteWorkout = async (postId) => {
+  const handleDeleteWorkout = async (workoutId) => {
     try {
-      await deleteMyWorkouts(postId);
+      await deleteMyWorkouts(workoutId);
       // Update the userWorkouts state by filtering out the deleted post
-      setUserWorkouts(userWorkouts.filter(workout => workout.id !== postId));
+      setUserWorkouts(userWorkouts.filter(workout => workout.id !== workoutId));
     } catch (error) {
       console.error("Error deleting post:", error);
     }
