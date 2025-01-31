@@ -20,6 +20,7 @@ export const WorkoutLog = ({ currentUser }) => {
   const [repNumber, setRepNumber] = useState(0);
   const [loggedSets, setLoggedSets] = useState([]);
   const [workoutExercises, setWorkoutExercises] = useState([]);
+  const [currentWorkout, setCurrentWorkout] = useState(null);
 
   const fetchAllMuscleGroups = async () => {
     try {
@@ -60,50 +61,54 @@ export const WorkoutLog = ({ currentUser }) => {
 
   const handleAddedSet = async (event) => {
     event.preventDefault();
+
+    if (!workoutName) {
+      alert("Please enter a workout name first");
+      return;
+    }
+
     const formatDate = (date) => {
       const d = new Date(date);
+      const year = d.getFullYear();
       const month = String(d.getMonth() + 1).padStart(2, "0");
       const day = String(d.getDate()).padStart(2, "0");
-      const year = d.getFullYear();
       return `${year}-${month}-${day}`;
     };
 
-    if (repNumber && workoutWeight && selectedExercise !== "0") {
+    try {
+      // Create workout if doesn't exist
+      let workoutId;
+      if (!currentWorkout) {
+        const workout = await addWorkout({
+          title: workoutName,
+          muscleGroupId: parseInt(selectedMuscleGroup),
+          userId: currentUser.id,
+          dateCompleted: formatDate(new Date()),
+        });
+        setCurrentWorkout(workout);
+        workoutId = workout.id;
+      } else {
+        workoutId = currentWorkout.id;
+      }
+
+      const workoutExercise = await addWorkoutExercise({
+        workoutId: workoutId,
+        exerciseId: parseInt(selectedExercise),
+        order: workoutExercises.length + 1,
+      });
+
       const newUserSet = {
-        // exerciseName:
-        //   exercises.find((ex) => ex.id === parseInt(selectedExercise))?.name ||
-        //   "Unknown Exercise",
-        workoutExerciseId: parseInt(),
-        // exerciseId: parseInt(selectedExercise),
+        workoutExerciseId: workoutExercise.id,
         reps: repNumber,
         weight: parseInt(workoutWeight),
         setOrder: loggedSets.length + 1,
         createdAt: formatDate(new Date()),
       };
-      
-      
-      if (repNumber && workoutWeight && selectedExercise !== "0") {
-        const newWorkoutExercise = {
-          workoutId: parseInt(),
-          exerciseId: parseInt(selectedExercise),
-          order: loggedSets.length + 1,
-        };
-        await addWorkoutExercise(newWorkoutExercise);
-      }
-      try {
-        const savedSet = await addSets(newUserSet);
-        console.log("Saved set:", savedSet); // Debug log
-        
-        if (savedSet && savedSet.id) {
-            setLoggedSets(prevSets => [...prevSets, savedSet]);
-            setRepNumber(0);
-            setWorkoutWeight(0);
-        } else {
-            console.error("No ID in saved set:", savedSet);
-        }
+
+      const savedSet = await addSets(newUserSet);
+      setLoggedSets((prev) => [...prev, savedSet]);
     } catch (error) {
-        console.error("Error adding set:", error);
-    }
+      console.error("Error adding set:", error);
     }
   };
 
@@ -164,24 +169,13 @@ export const WorkoutLog = ({ currentUser }) => {
       alert("Failed to save workout. Please try again.");
     }
   };
-  const handleDeleteSet = async (set) => {
+
+  const handleDeleteSet = async (setId) => {
     try {
-      await deleteSet(set.id);
-
-      // Fix the filter to compare the current set with the one to delete
-      setLoggedSets((prevSets) =>
-        prevSets.filter((s) => s.setOrder !== set.setOrder)
-      );
-
-      // Optionally reorder remaining sets
-      setLoggedSets((prevSets) =>
-        prevSets.map((s, index) => ({
-          ...s,
-          setOrder: index + 1,
-        }))
-      );
+      await deleteSet(setId);
+      setLoggedSets(loggedSets.filter((set) => set.id !== setId));
     } catch (error) {
-      console.error("Error deleting set:", error);
+      console.error("Error deleting post:", error);
     }
   };
   return (
@@ -270,7 +264,7 @@ export const WorkoutLog = ({ currentUser }) => {
         <div className="logged-sets">
           {loggedSets.map((set) => (
             <div key={set.id} className="set-box">
-              <button onClick={() => handleDeleteSet(set)}>Delete</button>
+              <button onClick={() => handleDeleteSet(set.id)}>Delete</button>
               <span>{set.exerciseName}</span>
               <span>Reps: {set.reps}</span>
               <span>Weight: {set.weight}</span>
