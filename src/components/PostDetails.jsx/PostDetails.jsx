@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { createLike, deleteLike, getLikes } from "../services/likesService";
 import { useParams } from "react-router-dom";
 import { deletePost, getPostByPostId, updatePost } from "../services/postService";
+import "./PostDetails.css"
 
 export const PostDetails = ({ currentUser }) => {
   const { postId } = useParams();
@@ -104,7 +105,7 @@ export const PostDetails = ({ currentUser }) => {
 
   return (
     <>
-      <h1>Post Details</h1>
+      <h1 className="post-details-title">Post Details</h1>
       <section className="post">
         <header className="post-header">{post.user?.name}</header>
         {isEditing ? (
