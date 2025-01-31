@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { createLike, deleteLike, getLikes } from "../services/likesService";
 import { useParams } from "react-router-dom";
-import { getPostByPostId, updatePost } from "../services/postService";
+import { deletePost, getPostByPostId, updatePost } from "../services/postService";
 
 export const PostDetails = ({ currentUser }) => {
   const { postId } = useParams();
@@ -93,9 +93,14 @@ export const PostDetails = ({ currentUser }) => {
     });
   }, [postId]);
 
-  const handleDelete = () => {
-
-  }
+  const handleDeletePost = async (postId) => {
+    try {
+      await deletePost(postId);
+      setPost(post.filter((post) => post.id !== postId));
+    } catch (error) {
+      console.error("Error deleting post:", error);
+    }
+  };
 
   return (
     <>
@@ -126,7 +131,6 @@ export const PostDetails = ({ currentUser }) => {
             <div className="edit-buttons">
               <button onClick={handleSave}>Save</button>
               <button onClick={handleCancel}>Cancel</button>
-              <button onClick={handleDelete}>Delete</button>
             </div>
           </>
         ) : (
@@ -159,6 +163,7 @@ export const PostDetails = ({ currentUser }) => {
                 {hasUserLiked ? "Unlike" : "Like"}
               </button>
               {isPostOwner && <button onClick={handleEdit}>Edit Post</button>}
+                {isPostOwner && <button onClick={handleDeletePost}>Delete</button>}
             </div>
           </>
         )}
