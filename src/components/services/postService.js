@@ -29,8 +29,8 @@ export const updatePost = async (postId, updatedData) => {
   return response.json();
 };
 
-export const deleteMyPost = (post) => {
-  return fetch(`http://localhost:8088/posts/${post}`, {
+export const deleteMyWorkouts = (post) => {
+  return fetch(`http://localhost:8088/workouts/${post}`, {
       method: "DELETE"
   })
 }

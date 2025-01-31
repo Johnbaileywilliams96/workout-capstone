@@ -3,7 +3,7 @@ import "./Profile.css";
 import { getUser } from "../services/userService";
 import { getWorkout } from "../services/getWorkout";
 import { getLikes } from "../services/likesService";
-import { deleteMyPost, updatePost } from "../services/postService";
+import { deleteMyWorkouts, updatePost } from "../services/postService";
 
 export const Profile = ({ currentUser }) => {
   const [allUsers, setAllUsers] = useState([]);
@@ -27,18 +27,16 @@ export const Profile = ({ currentUser }) => {
 
       const likesArray = await getLikes();
 
-      console.log(workoutArray)
 
       const currentUserLikes = likesArray
         .filter((like) => like.userId === currentUser.id)
         .map((like) => {
-          // Find the full post data from workoutArray using postId
           const fullPost = workoutArray.find(
             (workout) => workout.id === like.postId
           );
           return {
             ...like,
-            post: fullPost, // This adds the full post data to each like
+            post: fullPost, 
           };
         });
 
@@ -101,7 +99,7 @@ export const Profile = ({ currentUser }) => {
       const updatedPost = {
         id: editingWorkoutId,
         title: editedWorkout.title,
-        muscleGroup: editedWorkout.muscleGroupId,
+        muscleGroupId: editedWorkout.muscleGroupId,
         dateCompleted: editedWorkout.dateCompleted,
         userId: currentUser.id  // Make sure to include this if your API needs it
       };
@@ -112,9 +110,7 @@ export const Profile = ({ currentUser }) => {
       // Update local state with the response from the server
       setUserWorkouts(prevWorkouts =>
         prevWorkouts.map(workout =>
-          workout.id === editingWorkoutId
-            ? updatedData  // Use the actual response from the server
-            : workout
+          workout.id === editingWorkoutId ? updatedData : workout
         )
       );
   
@@ -126,7 +122,7 @@ export const Profile = ({ currentUser }) => {
       setEditingWorkoutId(null);
       setEditedWorkout({
         title: "",
-        muscleGroup: { description: "" },
+        muscleGroupId: { description: "" },
         dateCompleted: ""
       });
     } catch (error) {
@@ -136,9 +132,9 @@ export const Profile = ({ currentUser }) => {
   };
 
 
-  const handleDeletePost = async (postId) => {
+  const handleDeleteWorkout = async (postId) => {
     try {
-      await deleteMyPost(postId);
+      await deleteMyWorkouts(postId);
       // Update the userWorkouts state by filtering out the deleted post
       setUserWorkouts(userWorkouts.filter(workout => workout.id !== postId));
     } catch (error) {
@@ -149,16 +145,6 @@ export const Profile = ({ currentUser }) => {
   useEffect(() => {
     fetchAllUsersWorkouts();
   }, [currentUser.id]);
-
-  // useEffect(() => {
-  //   getPostByPostId(postId).then((data) => {
-  //     const singlePost = data[0];
-  //     if (singlePost) {
-  //       setPost(singlePost);
-  //       setEditedPost(singlePost);
-  //     }
-  //   });
-  // }, [postId]);
 
   return (
     <div className="Profile-container">
@@ -225,13 +211,13 @@ export const Profile = ({ currentUser }) => {
                       onClick={() => handleEdit(workout)}
                       className="edit-post-button"
                     >
-                      Edit Post
+                      Edit 
                     </button>
                     <button
-                      onClick={() => handleDeletePost(workout.id)}
+                      onClick={() => handleDeleteWorkout(workout.id)}
                       className="edit-delete-button"
                     >
-                      Delete Post
+                      Delete 
                     </button>
                   </div>
                 </>

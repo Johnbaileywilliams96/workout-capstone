@@ -31,8 +31,6 @@ export const WorkoutLog = ({ currentUser }) => {
 
       const workoutExerciseArray = await getWorkoutExercises();
       setWorkoutExercises(workoutExerciseArray);
-
-      console.log(workoutExerciseArray);
     } catch (error) {
       console.error("Error fetching liked posts:", error);
     }
@@ -72,10 +70,11 @@ export const WorkoutLog = ({ currentUser }) => {
 
     if (repNumber && workoutWeight && selectedExercise !== "0") {
       const newUserSet = {
-        exerciseName:
-          exercises.find((ex) => ex.id === parseInt(selectedExercise))?.name ||
-          "Unknown Exercise",
-        exerciseId: parseInt(selectedExercise),
+        // exerciseName:
+        //   exercises.find((ex) => ex.id === parseInt(selectedExercise))?.name ||
+        //   "Unknown Exercise",
+        workoutExerciseId: parseInt(),
+        // exerciseId: parseInt(selectedExercise),
         reps: repNumber,
         weight: parseInt(workoutWeight),
         setOrder: loggedSets.length + 1,
@@ -92,17 +91,19 @@ export const WorkoutLog = ({ currentUser }) => {
         await addWorkoutExercise(newWorkoutExercise);
       }
       try {
-        // Get the response from addSets which should include the ID
         const savedSet = await addSets(newUserSet);
-
-        // Add the set with its new ID to the local state
-        setLoggedSets((prevSets) => [...prevSets, savedSet]);
-
-        setRepNumber(0);
-        setWorkoutWeight(0);
-      } catch (error) {
-        console.error("Error adding set to database:", error);
-      }
+        console.log("Saved set:", savedSet); // Debug log
+        
+        if (savedSet && savedSet.id) {
+            setLoggedSets(prevSets => [...prevSets, savedSet]);
+            setRepNumber(0);
+            setWorkoutWeight(0);
+        } else {
+            console.error("No ID in saved set:", savedSet);
+        }
+    } catch (error) {
+        console.error("Error adding set:", error);
+    }
     }
   };
 
@@ -268,7 +269,7 @@ export const WorkoutLog = ({ currentUser }) => {
         </div>
         <div className="logged-sets">
           {loggedSets.map((set) => (
-            <div key={set.setOrder} className="set-box">
+            <div key={set.id} className="set-box">
               <button onClick={() => handleDeleteSet(set)}>Delete</button>
               <span>{set.exerciseName}</span>
               <span>Reps: {set.reps}</span>

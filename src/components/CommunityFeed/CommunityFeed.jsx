@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { getPosts } from "../services/postService";
-import { getWorkout, getWorkoutExercises } from "../services/getWorkout";
-import { getUser } from "../services/userService";
+// import { getWorkout, getWorkoutExercises } from "../services/getWorkout";
+// import { getUser } from "../services/userService";
 import "./CommunityFeed.css";
 import { createLike, getLikes, deleteLike } from "../services/likesService";
 
@@ -64,8 +64,6 @@ export const CommunityFeed = ({ currentUser }) => {
   const isPostLiked = (postId) => {
     return userLikes.some((like) => like.postId === postId && like.userId === currentUser.id);
   };
-
-  // New function to count likes for a specific post
   const getPostLikesCount = (postId) => {
     return userLikes.filter((like) => like.postId === postId).length;
   };
