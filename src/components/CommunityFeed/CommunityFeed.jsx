@@ -140,7 +140,7 @@ export const CommunityFeed = ({ currentUser }) => {
           return (
             <div key={post.id} className="post-ticket">
               <p>{post.user?.name}</p>
-              <p>{post.content}</p>
+              {/* <p>{post.content}</p> */}
               <Link to={`/postDetails/${post.id}`} key={post.id}>
                 <h2 className="h2-communityFeed">Title: {post.workout?.title}</h2>
               </Link>

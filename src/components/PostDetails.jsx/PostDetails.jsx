@@ -8,6 +8,7 @@ import {
 } from "../services/postService";
 import "./PostDetails.css";
 import { getMuscleGroup } from "../services/muscleGroupService";
+import { getWorkout, getWorkoutExercises } from "../services/getWorkout";
 
 export const PostDetails = ({ currentUser }) => {
   const { postId } = useParams();
@@ -17,9 +18,27 @@ export const PostDetails = ({ currentUser }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedPost, setEditedPost] = useState({});
   const [muscleGroups, setMuscleGroups] = useState([])
+  const [sets, setSets] = useState([])
+  const [workoutExercise, setWorkoutExercises] = useState([])
+  const [workouts, setWorkouts] = useState([])
 
   const hasUserLiked = postLikes.some((like) => like.userId === currentUser.id);
   const isPostOwner = post.userId === currentUser.id;
+
+  const getSets = (setId) => {
+    const set = sets.find(s => s.id === setId)
+    return set
+  }
+
+  const getWorkoutExerciseId = (workoutExerciseId) => {
+    const workoutExercises = workoutExercise.find(we => we.id === workoutExerciseId)
+    return workoutExercises
+  }
+
+  const getWorkout = (workoutId) => {
+    const workouts = workout.find(we => we.id === workoutId)
+    return workouts
+  }
   
   const getMuscleGroupName = (muscleGroupId) => {
     const muscleGroup = muscleGroups.find(mg => mg.id === muscleGroupId);
@@ -35,6 +54,40 @@ export const PostDetails = ({ currentUser }) => {
       setPostLikes(currentPostLikes);
     });
   };
+  useEffect(() => {
+    const fetchSets = async () => {
+      try {
+        const setsData = await getSets()
+        setSets(setsData)
+      } catch (error) {
+        console.error("error fetching sets:", error)
+      }
+    }
+  })
+
+  useEffect(() => {
+    const fetchWorkoutExercise = async () => {
+      try {
+        const workoutExerciseData = await getWorkoutExercises()
+        setWorkoutExercises(workoutExerciseData)
+      } catch (error) {
+        console.error("error fetching workoutExercises:", error)
+      }
+    }
+  })
+
+  useEffect(() => {
+    const fetchWorkouts = async () => {
+      try {
+        const workoutData = await getWorkout()
+        setWorkouts(workoutData)
+      } catch (error) {
+        console.error("error fetching workoutExercises:", error)
+      }
+    }
+  })
+
+
   useEffect(() => {
     const fetchMuscleGroups = async () => {
       try {
