@@ -9,6 +9,7 @@ import {
 import "./PostDetails.css";
 import { getMuscleGroup } from "../services/muscleGroupService";
 import { getWorkout, getWorkoutExercises } from "../services/getWorkout";
+import { getSets } from "../services/setsService";
 
 export const PostDetails = ({ currentUser }) => {
   const { postId } = useParams();
@@ -17,32 +18,29 @@ export const PostDetails = ({ currentUser }) => {
   const [postLikes, setPostLikes] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
   const [editedPost, setEditedPost] = useState({});
-  const [muscleGroups, setMuscleGroups] = useState([])
-  const [sets, setSets] = useState([])
-  const [workoutExercise, setWorkoutExercises] = useState([])
-  const [workouts, setWorkouts] = useState([])
+  const [muscleGroups, setMuscleGroups] = useState([]);
+  const [sets, setSets] = useState([]);
+  const [workoutExercises, setWorkoutExercises] = useState([]);
+  const [workouts, setWorkouts] = useState([]);
 
   const hasUserLiked = postLikes.some((like) => like.userId === currentUser.id);
   const isPostOwner = post.userId === currentUser.id;
 
-  const getSets = (setId) => {
-    const set = sets.find(s => s.id === setId)
-    return set
-  }
+  const getSetsByWorkoutExercise = (workoutExerciseId) => {
+    return sets.filter((set) => set.workoutExerciseId === workoutExerciseId);
+  };
 
-  const getWorkoutExerciseId = (workoutExerciseId) => {
-    const workoutExercises = workoutExercise.find(we => we.id === workoutExerciseId)
-    return workoutExercises
-  }
+  const getWorkoutExercisesByWorkout = (workoutId) => {
+    return workoutExercises.filter((we) => we.workoutId === workoutId);
+  };
 
-  const getWorkout = (workoutId) => {
-    const workouts = workout.find(we => we.id === workoutId)
-    return workouts
-  }
-  
+  const getWorkoutDetails = (workoutId) => {
+    return workouts.find((w) => w.id === workoutId);
+  };
+
   const getMuscleGroupName = (muscleGroupId) => {
-    const muscleGroup = muscleGroups.find(mg => mg.id === muscleGroupId);
-    return muscleGroup ? muscleGroup.name : 'Unknown';
+    const muscleGroup = muscleGroups.find((mg) => mg.id === muscleGroupId);
+    return muscleGroup ? muscleGroup.name : "Unknown";
   };
 
   const fetchAllLikes = async () => {
@@ -57,36 +55,38 @@ export const PostDetails = ({ currentUser }) => {
   useEffect(() => {
     const fetchSets = async () => {
       try {
-        const setsData = await getSets()
-        setSets(setsData)
+        const setsData = await getSets();
+        setSets(setsData);
       } catch (error) {
-        console.error("error fetching sets:", error)
+        console.error("Error fetching sets:", error);
       }
-    }
-  })
+    };
+    fetchSets();
+  }, []);
 
   useEffect(() => {
-    const fetchWorkoutExercise = async () => {
+    const fetchWorkoutExercises = async () => {
       try {
-        const workoutExerciseData = await getWorkoutExercises()
-        setWorkoutExercises(workoutExerciseData)
+        const workoutExerciseData = await getWorkoutExercises();
+        setWorkoutExercises(workoutExerciseData);
       } catch (error) {
-        console.error("error fetching workoutExercises:", error)
+        console.error("Error fetching workoutExercises:", error);
       }
-    }
-  })
+    };
+    fetchWorkoutExercises();
+  }, []);
 
   useEffect(() => {
     const fetchWorkouts = async () => {
       try {
-        const workoutData = await getWorkout()
-        setWorkouts(workoutData)
+        const workoutData = await getWorkout();
+        setWorkouts(workoutData);
       } catch (error) {
-        console.error("error fetching workoutExercises:", error)
+        console.error("Error fetching workouts:", error);
       }
-    }
-  })
-
+    };
+    fetchWorkouts();
+  }, []);
 
   useEffect(() => {
     const fetchMuscleGroups = async () => {
@@ -211,24 +211,49 @@ export const PostDetails = ({ currentUser }) => {
           </>
         ) : (
           <>
-          <div>
+            <div>
               <span className="post-info">Workout: </span>
               {post.workout?.title}
             </div>
             <div>
               <span className="post-info">Muscle Group: </span>
-              {post.workout?.muscleGroupId ? 
-                getMuscleGroupName(post.workout.muscleGroupId) 
-                : 'Not specified'}
+              {post.workout?.muscleGroupId
+                ? getMuscleGroupName(post.workout.muscleGroupId)
+                : "Not specified"}
             </div>
-            <div>
+            {/* <div>
               <span className="post-info">Content: </span>
               {post.content}
-            </div>
+            </div> */}
             <div>
               <span className="post-info">Date: </span>
               {post.createdAt}
             </div>
+
+            {post.workoutId && (
+              <div className="workout-details">
+                {/* <h3>Exercises and Sets</h3> */}
+                {getWorkoutExercisesByWorkout(post.workoutId).map(
+                  (workoutExercise) => (
+                    <div key={workoutExercise.id} className="exercise-details">
+                      <h4>Exercises: {workoutExercise.exerciseName}</h4>
+                      <div className="sets-list">
+                        {getSetsByWorkoutExercise(workoutExercise.id).map(
+                          (set, index) => (
+                            <div key={set.id} className="set-details">
+                              <span>Set {index + 1}: </span>
+                              <span>Weight: {set.weight}lbs </span>
+                              <span>Reps: {set.reps}</span>
+                            </div>
+                          )
+                        )}
+                      </div>
+                    </div>
+                  )
+                )}
+              </div>
+            )}
+
             <div>
               <span className="post-info">Likes: </span>
               {postLikes.length}
