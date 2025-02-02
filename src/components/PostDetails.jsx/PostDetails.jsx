@@ -232,16 +232,16 @@ export const PostDetails = ({ currentUser }) => {
 
             {post.workoutId && (
               <div className="workout-details">
+                <h4>Exercises:</h4>
                 {/* <h3>Exercises and Sets</h3> */}
                 {getWorkoutExercisesByWorkout(post.workoutId).map(
                   (workoutExercise) => (
                     <div key={workoutExercise.id} className="exercise-details">
-                      <h4>Exercises: {workoutExercise.exerciseName}</h4>
                       <div className="sets-list">
                         {getSetsByWorkoutExercise(workoutExercise.id).map(
-                          (set, index) => (
+                          (set) => (
                             <div key={set.id} className="set-details">
-                              <span>Set {index + 1}: </span>
+                              <span>Set {set.setOrder}: </span>
                               <span>Weight: {set.weight}lbs </span>
                               <span>Reps: {set.reps}</span>
                             </div>
