@@ -27,3 +27,20 @@ export const deleteSet = async (setId) => {
     }
     return await response.json();
   };
+
+  export const updateSet = async (setId, updatedData) => {
+    const response = await fetch(`http://localhost:8088/sets/${setId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(updatedData),
+    });
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    return response.json();
+  };
+  

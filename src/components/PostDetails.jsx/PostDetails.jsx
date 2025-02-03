@@ -5,11 +5,17 @@ import {
   deletePost,
   getPostByPostId,
   updatePost,
+  deleteMyWorkouts,
 } from "../services/postService";
 import "./PostDetails.css";
 import { getMuscleGroup } from "../services/muscleGroupService";
-import { getWorkout, getWorkoutExercises } from "../services/getWorkout";
-import { getSets } from "../services/setsService";
+import {
+  getWorkout,
+  getWorkoutExercises,
+  updateWorkoutExercise,
+} from "../services/getWorkout";
+import { getSets, updateSet, deleteSet } from "../services/setsService";
+import { updateMuscleGroup } from "../services/muscleGroupService";
 
 export const PostDetails = ({ currentUser }) => {
   const { postId } = useParams();
@@ -18,6 +24,9 @@ export const PostDetails = ({ currentUser }) => {
   const [postLikes, setPostLikes] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
   const [editedPost, setEditedPost] = useState({});
+  const [editingSetId, setEditingSetId] = useState(null);
+  const [editedSets, setEditedSets] = useState({});
+  const [editedMuscleGroup, setEditedMuscleGroup] = useState({});
   const [muscleGroups, setMuscleGroups] = useState([]);
   const [sets, setSets] = useState([]);
   const [workoutExercises, setWorkoutExercises] = useState([]);
@@ -100,6 +109,25 @@ export const PostDetails = ({ currentUser }) => {
     fetchMuscleGroups();
   }, []);
 
+  const handleSetInputChange = (setId, field, value) => {
+    const originalSet = sets.find((s) => s.id === setId);
+    setEditedSets((prev) => ({
+      ...prev,
+      [setId]: {
+        ...originalSet,
+        ...prev[setId],
+        [field]: field === "createdAt" ? value : parseInt(value),
+      },
+    }));
+  };
+
+  const handleMuscleGroupChange = (event) => {
+    setEditedMuscleGroup({
+      ...editedMuscleGroup,
+      id: parseInt(event.target.value),
+    });
+  };
+
   const handleEdit = () => {
     setIsEditing(true);
     setEditedPost({ ...post });
@@ -112,18 +140,27 @@ export const PostDetails = ({ currentUser }) => {
 
   const handleSave = async () => {
     try {
-      // Make sure editedPost has the id
       const postToUpdate = {
-        ...editedPost,
-        id: parseInt(postId), // Ensure id is included and is a number
+        userId: post.userId,
+        content: editedPost.content,
+        workoutId: post.workoutId,
+        createdAt: post.createdAt,
+        id: parseInt(postId),
       };
 
-      await updatePost(postToUpdate); // Pass single post object
-      setPost(postToUpdate);
+      await updatePost(parseInt(postId), postToUpdate);
+
+      // Update sets
+      for (const [setId, setData] of Object.entries(editedSets)) {
+        const originalSet = sets.find((s) => s.id === parseInt(setId));
+        await updateSet(parseInt(setId), { ...originalSet, ...setData });
+      }
+
+      const updatedPost = await getPostByPostId(postId);
+      setPost(updatedPost[0]);
       setIsEditing(false);
     } catch (error) {
-      console.error("Error updating post:", error);
-      alert("Failed to update post. Please try again.");
+      console.error("Error updating:", error);
     }
   };
 
@@ -171,10 +208,21 @@ export const PostDetails = ({ currentUser }) => {
 
   const handleDeletePost = async (postId) => {
     try {
+      const workoutExercises = getWorkoutExercisesByWorkout(post.workoutId);
+      
+      for (const workoutExercise of workoutExercises) {
+        const relatedSets = getSetsByWorkoutExercise(workoutExercise.id);
+        for (const set of relatedSets) {
+          await deleteSet(set.id);
+        }
+      }
+      
       await deletePost(postId);
-      setPost(post.filter((post) => post.id !== postId));
+      await deleteMyWorkouts(post.workoutId);
+  
+      window.location.href = "/workoutLog"; 
     } catch (error) {
-      console.error("Error deleting post:", error);
+      console.error("Error deleting:", error);
     }
   };
 
@@ -185,6 +233,75 @@ export const PostDetails = ({ currentUser }) => {
         <header className="post-header">{post.user?.name}</header>
         {isEditing ? (
           <>
+            <div>
+              <span className="post-info">Muscle Group: </span>
+              <select
+                value={
+                  editedMuscleGroup.id || post.workout?.muscleGroupId || ""
+                }
+                onChange={handleMuscleGroupChange}
+                className="edit-input"
+              >
+                {muscleGroups.map((mg) => (
+                  <option key={mg.id} value={mg.id}>
+                    {mg.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {post.workoutId && (
+              <div className="workout-details">
+                <h4>Exercises:</h4>
+                {getWorkoutExercisesByWorkout(post.workoutId).map(
+                  (workoutExercise) => (
+                    <div key={workoutExercise.id} className="exercise-details">
+                      <div className="sets-list">
+                        {getSetsByWorkoutExercise(workoutExercise.id).map(
+                          (set) => (
+                            <div key={set.id} className="set-details">
+                              <span>Set {set.setOrder}: </span>
+                              <input
+                                type="number"
+                                value={
+                                  (editedSets[set.id]?.weight ?? set.weight) ||
+                                  ""
+                                }
+                                onChange={(e) =>
+                                  handleSetInputChange(
+                                    set.id,
+                                    "weight",
+                                    e.target.value
+                                  )
+                                }
+                                className="edit-input"
+                              />
+                              <span>lbs </span>
+                              <input
+                                type="number"
+                                value={
+                                  (editedSets[set.id]?.reps ?? set.reps) || ""
+                                }
+                                onChange={(e) =>
+                                  handleSetInputChange(
+                                    set.id,
+                                    "reps",
+                                    e.target.value
+                                  )
+                                }
+                                className="edit-input"
+                              />
+                              <span>reps</span>
+                            </div>
+                          )
+                        )}
+                      </div>
+                    </div>
+                  )
+                )}
+              </div>
+            )}
+
             <div>
               <span className="post-info">Title: </span>
               <input
@@ -221,10 +338,6 @@ export const PostDetails = ({ currentUser }) => {
                 ? getMuscleGroupName(post.workout.muscleGroupId)
                 : "Not specified"}
             </div>
-            {/* <div>
-              <span className="post-info">Content: </span>
-              {post.content}
-            </div> */}
             <div>
               <span className="post-info">Date: </span>
               {post.createdAt}
@@ -233,7 +346,6 @@ export const PostDetails = ({ currentUser }) => {
             {post.workoutId && (
               <div className="workout-details">
                 <h4>Exercises:</h4>
-                {/* <h3>Exercises and Sets</h3> */}
                 {getWorkoutExercisesByWorkout(post.workoutId).map(
                   (workoutExercise) => (
                     <div key={workoutExercise.id} className="exercise-details">

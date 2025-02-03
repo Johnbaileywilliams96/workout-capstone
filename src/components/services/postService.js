@@ -48,28 +48,19 @@ export const updatePost = async (postId, updatedData) => {
   
   return response.json();
 };
+
+
+
+
+
 export const deletePost = async (postId) => {
   await fetch(`http://localhost:8088/posts/${postId}`, {
     method: "DELETE"
   });
-  
-  const response = await fetch(`http://localhost:8088/workouts/${postId}`, {
-    method: "DELETE"
-  });
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
-  }
-  return await response.json();
 };
 
-// export const deleteMyPost = (post) => {
-//   return fetch(`http://localhost:8088/posts/${post}`, {
-//       method: "DELETE"
-//   })
-// }
-
-export const deleteMyWorkouts = (post) => {
-  return fetch(`http://localhost:8088/workouts/${post}`, {
+export const deleteMyWorkouts = (workoutId) => {
+  return fetch(`http://localhost:8088/workouts/${workoutId}`, {
       method: "DELETE"
   })
 }

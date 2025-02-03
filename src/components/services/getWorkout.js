@@ -19,6 +19,22 @@ export const addWorkoutExercise = async (workout) => {
   }).then((res) => res.json())
 }
 
+export const updateWorkoutExercise = async (workoutExerciseId, updatedData) => {
+  const response = await fetch(`http://localhost:8088/workoutExercise/${workoutExerciseId}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(updatedData),
+  });
+  
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+  
+  return response.json();
+};
+
 export const addWorkout = async (workout) => {
   return fetch("http://localhost:8088/workouts", {
       method: "POST",
@@ -29,3 +45,8 @@ export const addWorkout = async (workout) => {
   }).then((res) => res.json())
 }
 
+// export const deleteWorkoutExercise = async (workoutExerciseId) => {
+//   await fetch(`http://localhost:8088/workoutExercises/${workoutExerciseId}`, {
+//     method: "DELETE"
+//   });
+// }

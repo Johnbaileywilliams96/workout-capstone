@@ -88,7 +88,7 @@ export const WorkoutLog = ({ currentUser }) => {
     }
 
     try {
-      // Create workout if doesn't exist
+      
       let workoutId;
       if (!currentWorkout) {
         const workout = await addWorkout({
@@ -120,7 +120,6 @@ export const WorkoutLog = ({ currentUser }) => {
       const savedSet = await addSets(newUserSet);
       setLoggedSets((prev) => [...prev, savedSet]);
 
-      // Reset the rep and weight inputs after adding a set
       setRepNumber(0);
       setWorkoutWeight(0);
     } catch (error) {
@@ -131,7 +130,7 @@ export const WorkoutLog = ({ currentUser }) => {
 
   const handleCompleteWorkout = async () => {
     try {
-      // Only create post using the existing workout
+  
       if (!currentWorkout) {
         alert("No workout has been started. Please add at least one set first.");
         return;
@@ -142,7 +141,6 @@ export const WorkoutLog = ({ currentUser }) => {
         return;
       }
 
-      // Create the post
       const postData = {
         userId: currentUser.id,
         content: workoutName,
@@ -151,7 +149,6 @@ export const WorkoutLog = ({ currentUser }) => {
       };
       await addPosts(postData);
 
-      // Clear the form after successful save
       setWorkoutName("");
       setLoggedSets([]);
       setSelectedExercise("0");
