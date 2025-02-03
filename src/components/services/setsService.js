@@ -15,18 +15,22 @@ export const getSets = () => {
 }
 
 export const deleteSet = async (setId) => {
-    await fetch(`http://localhost:8088/workoutExercises/${setId}`, {
+  // First delete the set since it depends on the workoutExercise
+  const setResponse = await fetch(`http://localhost:8088/sets/${setId}`, {
       method: "DELETE"
-    });
-    
-    const response = await fetch(`http://localhost:8088/sets/${setId}`, {
-      method: "DELETE"
-    });
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    return await response.json();
-  };
+  });
+  if (!setResponse.ok) {
+      throw new Error(`HTTP error! status: ${setResponse.status}`);
+  }
+
+  // Then delete the workout exercise
+  // const workoutResponse = await fetch(`http://localhost:8088/workoutExercises/${workoutExerciseId}`, {
+  //     method: "DELETE"
+  // });
+  // if (!workoutResponse.ok) {
+  //     throw new Error(`HTTP error! status: ${workoutResponse.status}`);
+  // }
+};
 
   export const updateSet = async (setId, updatedData) => {
     const response = await fetch(`http://localhost:8088/sets/${setId}`, {

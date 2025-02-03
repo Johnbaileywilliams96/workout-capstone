@@ -15,7 +15,7 @@ export const Profile = ({ currentUser }) => {
   const [editedWorkout, setEditedWorkout] = useState({
     title: "",
     muscleGroupId: null,
-    dateCompleted: ""
+    dateCompleted: "",
   });
 
   const fetchAllUsersWorkouts = async () => {
@@ -27,7 +27,6 @@ export const Profile = ({ currentUser }) => {
 
       const likesArray = await getLikes();
 
-
       const currentUserLikes = likesArray
         .filter((like) => like.userId === currentUser.id)
         .map((like) => {
@@ -36,13 +35,12 @@ export const Profile = ({ currentUser }) => {
           );
           return {
             ...like,
-            post: fullPost, 
+            post: fullPost,
           };
         });
 
       setUserLikes(currentUserLikes);
 
-      // Filter workouts to only get current user's workouts
       const currentUsersWorkouts = workoutArray.filter(
         (workout) => workout.userId === currentUser.id
       );
@@ -57,29 +55,27 @@ export const Profile = ({ currentUser }) => {
     }
   };
 
- 
-
   const handleEdit = (workout) => {
     setIsEditing(true);
     setEditingWorkoutId(workout.id);
     setEditedWorkout({
       title: workout.title,
       muscleGroupId: workout.muscleGroup?.id,
-      dateCompleted: workout.dateCompleted
+      dateCompleted: workout.dateCompleted,
     });
   };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     if (name === "muscleGroupId") {
-      setEditedWorkout(prev => ({
+      setEditedWorkout((prev) => ({
         ...prev,
-        muscleGroup: parseInt(value)
+        muscleGroup: parseInt(value),
       }));
     } else {
-      setEditedWorkout(prev => ({
+      setEditedWorkout((prev) => ({
         ...prev,
-        [name]: value
+        [name]: value,
       }));
     }
   };
@@ -89,41 +85,36 @@ export const Profile = ({ currentUser }) => {
     setEditedWorkout({
       title: "",
       muscleGroupId: null,
-      dateCompleted: ""
+      dateCompleted: "",
     });
   };
 
   const handleUpdatePost = async () => {
     try {
-      // Create the updated post object
       const updatedPost = {
         id: editingWorkoutId,
         title: editedWorkout.title,
         muscleGroupId: editedWorkout.muscleGroupId,
         dateCompleted: editedWorkout.dateCompleted,
-        userId: currentUser.id  // Make sure to include this if your API needs it
+        userId: currentUser.id,
       };
-    
-      // Wait for the API response
+
       const updatedData = await updateWorkout(editingWorkoutId, updatedPost);
-    
-      // Update local state with the response from the server
-      setUserWorkouts(prevWorkouts =>
-        prevWorkouts.map(workout =>
+
+      setUserWorkouts((prevWorkouts) =>
+        prevWorkouts.map((workout) =>
           workout.id === editingWorkoutId ? updatedData : workout
         )
       );
-  
-      // Or alternatively, refetch all workouts
+
       await fetchAllUsersWorkouts();
-      
-      // Reset editing state
+
       setIsEditing(false);
       setEditingWorkoutId(null);
       setEditedWorkout({
         title: "",
         muscleGroupId: { description: "" },
-        dateCompleted: ""
+        dateCompleted: "",
       });
     } catch (error) {
       console.error("Error updating post:", error);
@@ -131,12 +122,12 @@ export const Profile = ({ currentUser }) => {
     }
   };
 
-
   const handleDeleteWorkout = async (workoutId) => {
     try {
       await deleteMyWorkouts(workoutId);
-      // Update the userWorkouts state by filtering out the deleted post
-      setUserWorkouts(userWorkouts.filter(workout => workout.id !== workoutId));
+      setUserWorkouts(
+        userWorkouts.filter((workout) => workout.id !== workoutId)
+      );
     } catch (error) {
       console.error("Error deleting post:", error);
     }
@@ -160,10 +151,9 @@ export const Profile = ({ currentUser }) => {
           <h3>Your Workouts</h3>
           {userWorkouts.map((workout) => (
             <div key={workout.id} className="Workout-item">
-
               {isEditing && editingWorkoutId === workout.id ? (
                 <div className="edit-post">
-                    <input
+                  <input
                     type="text"
                     name="title"
                     value={editedWorkout.title}
@@ -171,29 +161,26 @@ export const Profile = ({ currentUser }) => {
                     placeholder="Workout Type"
                     className="title-edit"
                   />
-                    <input
-                      type="number"
-                      name="muscleGroupId"
-                      value={editedWorkout.muscleGroupId || ''}
-                      onChange={handleInputChange}
-                      placeholder="Muscle Group ID"
-                      className="edit-description"
-                    />
-                   <input
+                  <input
+                    type="number"
+                    name="muscleGroupId"
+                    value={editedWorkout.muscleGroupId || ""}
+                    onChange={handleInputChange}
+                    placeholder="Muscle Group ID"
+                    className="edit-description"
+                  />
+                  <input
                     type="date"
                     name="dateCompleted"
                     value={editedWorkout.dateCompleted}
                     onChange={handleInputChange}
                     className="edit-date"
                   />
-                   <div className="post-update">
-                    <button 
-                      onClick={handleUpdatePost}
-                      className="update-post"
-                    >
+                  <div className="post-update">
+                    <button onClick={handleUpdatePost} className="update-post">
                       Save Changes
                     </button>
-                    <button 
+                    <button
                       onClick={handleCancelEdit}
                       className="cancel-button"
                     >
@@ -204,20 +191,22 @@ export const Profile = ({ currentUser }) => {
               ) : (
                 <>
                   <p className="workout-title">Workout Type: {workout.title}</p>
-                  <p className="workout-description">Description: {workout.muscleGroup?.description}</p>
+                  <p className="workout-description">
+                    Description: {workout.muscleGroup?.description}
+                  </p>
                   <p className="workout-date">Date: {workout.dateCompleted}</p>
                   <div className="buttons">
                     <button
                       onClick={() => handleEdit(workout)}
                       className="edit-post-button"
                     >
-                      Edit 
+                      Edit
                     </button>
                     <button
                       onClick={() => handleDeleteWorkout(workout.id)}
                       className="edit-delete-button"
                     >
-                      Delete 
+                      Delete
                     </button>
                   </div>
                 </>

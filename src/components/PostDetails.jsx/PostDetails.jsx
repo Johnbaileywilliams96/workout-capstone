@@ -17,7 +17,7 @@ import {
 import { getSets, updateSet, deleteSet } from "../services/setsService";
 import { updateMuscleGroup } from "../services/muscleGroupService";
 import { getExercises } from "../services/exerciseService";
-import { updateWorkout } from "../services/postService"
+import { updateWorkout } from "../services/postService";
 
 export const PostDetails = ({ currentUser }) => {
   const { postId } = useParams();
@@ -38,7 +38,7 @@ export const PostDetails = ({ currentUser }) => {
   const [editedWorkout, setEditedWorkout] = useState({
     title: "",
     muscleGroupId: null,
-    dateCompleted: ""
+    dateCompleted: "",
   });
 
   const hasUserLiked = postLikes.some((like) => like.userId === currentUser.id);
@@ -126,7 +126,7 @@ export const PostDetails = ({ currentUser }) => {
   useEffect(() => {
     const fetchExercises = async () => {
       try {
-        const exercisesData = await getExercises(); // You'll need to create this service
+        const exercisesData = await getExercises();
         setExercises(exercisesData);
       } catch (error) {
         console.error("Error fetching exercises:", error);
@@ -157,11 +157,11 @@ export const PostDetails = ({ currentUser }) => {
   const handleEdit = () => {
     setIsEditing(true);
     setEditedPost({ ...post });
-    setEditingWorkoutId(post.workoutId); // Fixed from workout.id
+    setEditingWorkoutId(post.workoutId);
     setEditedWorkout({
       title: post.workout?.title,
       muscleGroupId: post.workout?.muscleGroupId,
-      dateCompleted: post.workout?.dateCompleted
+      dateCompleted: post.workout?.dateCompleted,
     });
   };
 
@@ -183,15 +183,15 @@ export const PostDetails = ({ currentUser }) => {
       await updatePost(parseInt(postId), postToUpdate);
 
       if (editingWorkoutId) {
-      const workoutToUpdate = {
-        id: editingWorkoutId,
-        title: editedWorkout.title,
-        muscleGroupId: editedWorkout.muscleGroupId,
-        dateCompleted: editedWorkout.dateCompleted,
-        userId: currentUser.id
-      };
-      await updateWorkout(editingWorkoutId, workoutToUpdate);
-    }
+        const workoutToUpdate = {
+          id: editingWorkoutId,
+          title: editedWorkout.title,
+          muscleGroupId: editedWorkout.muscleGroupId,
+          dateCompleted: editedWorkout.dateCompleted,
+          userId: currentUser.id,
+        };
+        await updateWorkout(editingWorkoutId, workoutToUpdate);
+      }
 
       for (const [setId, setData] of Object.entries(editedSets)) {
         const originalSet = sets.find((s) => s.id === parseInt(setId));
@@ -220,48 +220,43 @@ export const PostDetails = ({ currentUser }) => {
   const handleWorkoutInputChange = (e) => {
     const { name, value } = e.target;
     if (name === "muscleGroupId") {
-      setEditedWorkout(prev => ({
+      setEditedWorkout((prev) => ({
         ...prev,
-        muscleGroup: parseInt(value)
+        muscleGroup: parseInt(value),
       }));
     } else {
-      setEditedWorkout(prev => ({
+      setEditedWorkout((prev) => ({
         ...prev,
-        [name]: value
+        [name]: value,
       }));
     }
   };
   const handleUpdateWorkout = async () => {
     try {
-      // Create the updated post object
       const updatedPost = {
         id: editingWorkoutId,
         title: editedWorkout.title,
         muscleGroupId: editedWorkout.muscleGroupId,
         dateCompleted: editedWorkout.dateCompleted,
-        userId: currentUser.id  // Make sure to include this if your API needs it
+        userId: currentUser.id,
       };
-    
-      // Wait for the API response
+
       const updatedData = await updateWorkout(editingWorkoutId, updatedPost);
-    
-      // Update local state with the response from the server
-      setUserWorkouts(prevWorkouts =>
-        prevWorkouts.map(workout =>
+
+      setUserWorkouts((prevWorkouts) =>
+        prevWorkouts.map((workout) =>
           workout.id === editingWorkoutId ? updatedData : workout
         )
       );
-  
-      // Or alternatively, refetch all workouts
+
       await fetchAllUsersWorkouts();
-      
-      // Reset editing state
+
       setIsEditing(false);
       setEditingWorkoutId(null);
       setEditedWorkout({
         title: "",
         muscleGroupId: { description: "" },
-        dateCompleted: ""
+        dateCompleted: "",
       });
     } catch (error) {
       console.error("Error updating post:", error);
@@ -331,16 +326,16 @@ export const PostDetails = ({ currentUser }) => {
         <h3>Content: {post.content}</h3>
         {isEditing ? (
           <>
-           <div>
-    <span className="post-info">Workout Title: </span>
-    <input
-      type="text"
-      name="title"
-      value={editedWorkout.title || ""}
-      onChange={handleWorkoutInputChange}
-      className="edit-input"
-    />
-  </div>
+            <div>
+              <span className="post-info">Workout Title: </span>
+              <input
+                type="text"
+                name="title"
+                value={editedWorkout.title || ""}
+                onChange={handleWorkoutInputChange}
+                className="edit-input"
+              />
+            </div>
             <div>
               <span className="post-info">Muscle Group: </span>
               <select
@@ -411,18 +406,8 @@ export const PostDetails = ({ currentUser }) => {
               </div>
             )}
 
-            {/* <div>
-              <span className="post-info">Title: </span>
-              <input
-                type="text"
-                name="title"
-                value={editedPost.title || ""}
-                onChange={handleInputChange}
-                className="edit-input"
-              />
-            </div> */}
             <textarea
-              name="content" // Changed from "body" to "content"
+              name="content"
               value={editedPost.content || ""}
               onChange={handleInputChange}
               className="edit-input"

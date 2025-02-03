@@ -108,7 +108,6 @@ export const WorkoutLog = ({ currentUser }) => {
         order: workoutExercises.length + 1,
       });
       
-      // Add this line to update workoutExercises
       setWorkoutExercises(prev => [...prev, workoutExercise]);
 
       const newUserSet = {
@@ -171,13 +170,13 @@ export const WorkoutLog = ({ currentUser }) => {
 
   const handleDeleteSet = async (setId) => {
     try {
-      await deleteSet(setId);
-      setLoggedSets(loggedSets.filter((set) => set.id !== setId));
+        await deleteSet(setId);
+        setLoggedSets(loggedSets.filter((set) => set.id !== setId));
     } catch (error) {
-      console.error("Error deleting set:", error);
-      alert("Failed to delete set. Please try again.");
+        console.error("Error deleting set:", error);
+        alert("Failed to delete set. Please try again.");
     }
-  };
+};
 
   return (
     <>
@@ -260,24 +259,24 @@ export const WorkoutLog = ({ currentUser }) => {
         </div>
 
         <div className="logged-sets">
-          {loggedSets.map((set) => {
-            const workoutExercise = workoutExercises.find(
-              (we) => we.id === set.workoutExerciseId
-            );
-            const exercise = exercises.find(
-              (e) => e.id === workoutExercise?.exerciseId
-            );
+    {loggedSets.map((set) => {
+        const workoutExercise = workoutExercises.find(
+            (we) => we.id === set.workoutExerciseId
+        );
+        const exercise = exercises.find(
+            (e) => e.id === workoutExercise?.exerciseId
+        );
 
-            return (
-              <div key={set.id} className="set-box">
+        return (
+            <div key={set.id} className="set-box">
                 <button onClick={() => handleDeleteSet(set.id)}>Delete</button>
                 <span>{exercise?.name}</span>
                 <span>Reps: {set.reps}</span>
                 <span>Weight: {set.weight}</span>
-              </div>
-            );
-          })}
-        </div>
+            </div>
+        );
+    })}
+</div>
 
         <button className="save-workout-btn" onClick={handleCompleteWorkout}>
           Save Workout
