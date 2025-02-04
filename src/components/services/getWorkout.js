@@ -45,8 +45,12 @@ export const addWorkout = async (workout) => {
   }).then((res) => res.json())
 }
 
-// export const deleteWorkoutExercise = async (workoutExerciseId) => {
-//   await fetch(`http://localhost:8088/workoutExercises/${workoutExerciseId}`, {
-//     method: "DELETE"
-//   });
-// }
+export const deleteWorkoutExercise = async (workoutExerciseId) => {
+  const response = await fetch(`http://localhost:8088/workoutExercises/${workoutExerciseId}`, {
+    method: "DELETE"
+  });
+  
+  if (!response.ok) {
+    throw new Error(`Failed to delete workout exercise: ${response.status}`);
+  }
+}
