@@ -34,6 +34,7 @@ export const PostDetails = ({ currentUser }) => {
   const [workoutExercises, setWorkoutExercises] = useState([]);
   const [workouts, setWorkouts] = useState([]);
   const [exercises, setExercises] = useState([]);
+  // const [editingExercise, setEditingExercise] = useState(null)
   const [editingWorkoutId, setEditingWorkoutId] = useState(null);
   const [editedWorkout, setEditedWorkout] = useState({
     title: "",
@@ -148,11 +149,18 @@ export const PostDetails = ({ currentUser }) => {
   };
 
   const handleMuscleGroupChange = (event) => {
-    setEditedMuscleGroup({
-      ...editedMuscleGroup,
-      id: parseInt(event.target.value),
-    });
+    setEditedWorkout(prev => ({
+      ...prev,
+      muscleGroupId: parseInt(event.target.value)
+    }));
   };
+
+  // const handleExerciseChange = (event) => {
+  //   setEditingExercise({
+  //     ...editingExercise,
+  //     id: parseInt(event.target.value),
+  //   });
+  // };
 
   const handleEdit = () => {
     setIsEditing(true);
@@ -339,19 +347,19 @@ export const PostDetails = ({ currentUser }) => {
             <div>
               <span className="post-info">Muscle Group: </span>
               <select
-                value={
-                  editedMuscleGroup.id || post.workout?.muscleGroupId || ""
-                }
-                onChange={handleMuscleGroupChange}
-                className="edit-input"
-              >
-                {muscleGroups.map((mg) => (
-                  <option key={mg.id} value={mg.id}>
-                    {mg.name}
-                  </option>
-                ))}
-              </select>
+  value={editedWorkout.muscleGroupId || ""}
+  onChange={handleMuscleGroupChange}
+  className="edit-input"
+>
+  {muscleGroups.map((mg) => (
+    <option key={mg.id} value={mg.id}>
+      {mg.name}
+    </option>
+  ))}
+</select>
             </div>
+
+          
 
             {post.workoutId && (
               <div className="workout-details">
