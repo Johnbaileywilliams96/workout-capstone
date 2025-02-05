@@ -153,6 +153,7 @@ export const Profile = ({ currentUser }) => {
         {cUser.map((user) => (
           <div key={user.id} className="Profile-item">
             <p>Name: {user.name}</p>
+            <p className="date-joined">Date Joined: {user.date}</p>
             <p className="email">Email: {user.email}</p>
           </div>
         ))}
