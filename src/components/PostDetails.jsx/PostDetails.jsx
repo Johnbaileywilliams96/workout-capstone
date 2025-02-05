@@ -357,7 +357,8 @@ export const PostDetails = ({ currentUser }) => {
                 {getWorkoutExercisesByWorkout(post.workoutId).map(
                   (workoutExercise) => (
                     <div key={workoutExercise.id} className="exercise-details">
-                      <h5>{getExerciseName(workoutExercise.exerciseId)}</h5>
+                      <h5>{getExerciseName(workoutExercise.exerciseId)}:</h5>
+
                       <div className="sets-list">
                         {getSetsByWorkoutExercise(workoutExercise.id).map(
                           (set) => (
@@ -435,24 +436,38 @@ export const PostDetails = ({ currentUser }) => {
             {post.workoutId && (
               <div className="workout-details">
                 <h4>Exercises:</h4>
-                {getWorkoutExercisesByWorkout(post.workoutId).map(
-                  (workoutExercise) => (
-                    <div key={workoutExercise.id} className="exercise-details">
-                      <h5>{getExerciseName(workoutExercise.exerciseId)}</h5>
+                {Array.from(
+                  new Set(
+                    getWorkoutExercisesByWorkout(post.workoutId).map(
+                      (we) => we.exerciseId
+                    )
+                  )
+                ).map((exerciseId) => {
+                  const workoutExercisesForThisExercise =
+                    getWorkoutExercisesByWorkout(post.workoutId).filter(
+                      (we) => we.exerciseId === exerciseId
+                    );
+
+                  return (
+                    <div key={exerciseId} className="exercise-details">
+                      <h5>{getExerciseName(exerciseId)}</h5>
                       <div className="sets-list">
-                        {getSetsByWorkoutExercise(workoutExercise.id).map(
-                          (set) => (
-                            <div key={set.id} className="set-details">
-                              <span>Set {set.setOrder}: </span>
-                              <span>Weight: {set.weight}lbs </span>
-                              <span>Reps: {set.reps}</span>
-                            </div>
-                          )
+                        {workoutExercisesForThisExercise.flatMap(
+                          (workoutExercise) =>
+                            getSetsByWorkoutExercise(workoutExercise.id).map(
+                              (set) => (
+                                <div key={set.id} className="set-details">
+                                  <span>Set {set.setOrder}: </span>
+                                  <span>Weight: {set.weight}lbs </span>
+                                  <span>Reps: {set.reps}</span>
+                                </div>
+                              )
+                            )
                         )}
                       </div>
                     </div>
-                  )
-                )}
+                  );
+                })}
               </div>
             )}
 

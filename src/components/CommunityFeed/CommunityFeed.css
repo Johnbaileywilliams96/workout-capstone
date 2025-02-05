@@ -2,16 +2,29 @@
     max-width: 800px;
     margin: 0 auto;
     padding: 20px;
-    background-color: #f5f5f5;
     min-height: 100vh;
 }
 
-.h2-communityFeed {
+.h2-communityFeed:hover {
     font-size: 2rem;
     font-weight: bold;
-    color: #333;
+    color: #3498db;
     text-align: center;
     margin-bottom: 2rem;
+    transform: translateY(-2px);
+}
+
+.muscle-group-dropdown {
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+}
+
+.muscle-group-dropdown:hover {
+    font-size: 1rem;
+    font-weight: bold;
+    text-align: center;
+    transform: translateY(-2px);
 }
 
 .post-ticket {
@@ -34,7 +47,7 @@
 
 .post-ticket p:first-child {
     font-weight: bold;
-    color: #2c5282;
+    color: #3498db;
     font-size: 1.1rem;
 }
 
@@ -68,7 +81,6 @@
     }
 }
 
-/* Optional: Add animations */
 @keyframes fadeIn {
     from {
         opacity: 0;
@@ -84,7 +96,6 @@
     animation: fadeIn 0.3s ease-out;
 }
 
-/* Optional: Add custom scrollbar */
 .community-feed-container::-webkit-scrollbar {
     width: 8px;
 }

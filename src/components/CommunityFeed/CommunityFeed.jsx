@@ -118,7 +118,11 @@ export const CommunityFeed = ({ currentUser }) => {
 
   return (
     <>
+
+      <h2>Community Feed</h2>
+      <div className="community-feed-container">
       <select
+      className="muscle-group-dropdown"
         id="muscleGroups"
         value={selectedMuscleGroup}
         onChange={muscleGroupChange}
@@ -130,9 +134,6 @@ export const CommunityFeed = ({ currentUser }) => {
           </option>
         ))}
       </select>
-
-      <h2>Community Feed</h2>
-      <div className="community-feed-container">
         {filteredPosts.map((post) => {
           const liked = isPostLiked(post.id);
           const likesCount = getPostLikesCount(post.id);
