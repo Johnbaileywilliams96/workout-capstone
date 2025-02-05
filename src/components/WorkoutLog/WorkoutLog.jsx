@@ -24,6 +24,8 @@ export const WorkoutLog = ({ currentUser }) => {
   const [loggedSets, setLoggedSets] = useState([]);
   const [workoutExercises, setWorkoutExercises] = useState([]);
   const [currentWorkout, setCurrentWorkout] = useState(null);
+  const [selectedDescription, setSelectedDescription] = useState("")
+  const [selectedMuscleGroupDescription, setSelectedMuscleGroupDescription] = useState("")
 
   const getWorkoutExercisesByWorkout = (workoutId) => {
     return workoutExercises.filter((we) => we.workoutId === workoutId);
@@ -61,13 +63,17 @@ export const WorkoutLog = ({ currentUser }) => {
   }, []);
 
   const handleMuscleGroupChange = (event) => {
-    const muscleGroupId = event.target.value;
-    setSelectedMuscleGroup(muscleGroupId);
+    const muscleGroupId = parseInt(event.target.value);
+    const selected = muscleGroup.find(group => group.id === muscleGroupId)
+    setSelectedMuscleGroupDescription(selected?.description || "")
+    setSelectedMuscleGroup(event.target.value);
   };
 
   const handleExerciseChange = (event) => {
-    const exerciseId = event.target.value;
-    setSelectedExercise(exerciseId);
+    const exerciseId = parseInt(event.target.value);
+    const selected = exercises.find(exercise => exercise.id === exerciseId)
+    setSelectedDescription(selected?.description || "")
+    setSelectedExercise(event.target.value);
   };
 
   const incrementReps = () => {
@@ -225,6 +231,11 @@ export const WorkoutLog = ({ currentUser }) => {
             ))}
           </select>
         </div>
+        {selectedMuscleGroupDescription && (
+      <div className="description-box">
+        {selectedMuscleGroupDescription}
+      </div>
+    )}
 
         <div className="exercise-selection">
           <div className="exercise-dropdown">
@@ -241,6 +252,13 @@ export const WorkoutLog = ({ currentUser }) => {
               ))}
             </select>
           </div>
+          {selectedDescription && (
+      <div className="description-box">
+        {selectedDescription}
+      </div>
+    )}
+
+
 
           <fieldset className="users-reps">
             <div>
