@@ -41,6 +41,7 @@ export const PostDetails = ({ currentUser }) => {
     dateCompleted: "",
   });
   const [grossWeight, setGrossWeight] = useState(0);
+  const [grossReps, setGrossReps] = useState(0);
 
   const hasUserLiked = postLikes.some((like) => like.userId === currentUser.id);
   const isPostOwner = post.userId === currentUser.id;
@@ -56,6 +57,23 @@ export const PostDetails = ({ currentUser }) => {
   const getWorkoutDetails = (workoutId) => {
     return workouts.find((w) => w.id === workoutId);
   };
+
+  const getTotalRepsCount = (workoutId) => {
+    if (!sets.length || !workoutId) return 0;
+
+    const workoutExercisesForWorkout = workoutExercises.filter(
+      we => we.workoutId === workoutId
+    );
+
+    const totalReps = workoutExercisesForWorkout.reduce((total, workoutExercise) => {
+      const exerciseSets = sets.filter(set => set.workoutExerciseId === workoutExercise.id);
+      const exerciseReps = exerciseSets.reduce((setTotal, set) => setTotal + (set.reps || 0), 0);
+      return total + exerciseReps;
+    }, 0)
+
+    setGrossReps(totalReps)
+    return totalReps
+  }
 
   const getTotalWorkoutWeight = (workoutId) => {
     if (!sets.length || !workoutId) return 0;
@@ -317,6 +335,9 @@ export const PostDetails = ({ currentUser }) => {
         if (sets.length && singlePost.workoutId) {
           getTotalWorkoutWeight(singlePost.workoutId);
         }
+        if (sets.length && singlePost.workoutId) {
+          getTotalRepsCount(singlePost.workoutId);
+        }
       }
     });
   }, [postId, sets, workoutExercises]);
@@ -494,6 +515,11 @@ export const PostDetails = ({ currentUser }) => {
             {grossWeight && (
               <div className="gross-weight">
                 Total Weight: {grossWeight} lbs
+              </div>
+            )}
+            {grossReps && (
+              <div className="gross-weight">
+                Total Reps: {grossReps} 
               </div>
             )}
               </div>
