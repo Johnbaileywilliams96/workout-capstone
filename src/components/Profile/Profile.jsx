@@ -4,8 +4,12 @@ import { getUser } from "../services/userService";
 import { getWorkout } from "../services/getWorkout";
 import { getLikes } from "../services/likesService";
 import { deleteMyWorkouts, updateWorkout } from "../services/postService";
+import { Link, useParams } from "react-router-dom";
+import { getWorkoutExercises } from "../services/getWorkout";
+import { getSets } from "../services/setsService";
 
 export const Profile = ({ currentUser }) => {
+  const { postId } = useParams();
   const [allUsers, setAllUsers] = useState([]);
   const [cUser, setCUser] = useState([]);
   const [userWorkouts, setUserWorkouts] = useState([]);
@@ -17,6 +21,9 @@ export const Profile = ({ currentUser }) => {
     muscleGroupId: null,
     dateCompleted: "",
   });
+  // const [post, setPost] = useState({});
+  // const [workoutExercises, setWorkoutExercises] = useState([]);
+  // const [sets, setSets] = useState([]);
 
   const fetchAllUsersWorkouts = async () => {
     try {
@@ -26,6 +33,8 @@ export const Profile = ({ currentUser }) => {
       const workoutArray = await getWorkout();
 
       const likesArray = await getLikes();
+      // const workoutExercisesArray = await getWorkoutExercises()
+      // const setsArray = await getSets()
 
       const currentUserLikes = likesArray
         .filter((like) => like.userId === currentUser.id)
@@ -225,11 +234,9 @@ export const Profile = ({ currentUser }) => {
           ))}
         </div>
 
-          <div className="progress-section">
-            <h3>Progress</h3>
-
-          </div>
-
+        <div className="progress-section">
+          <h3>Progress</h3>
+        </div>
       </div>
     </div>
   );

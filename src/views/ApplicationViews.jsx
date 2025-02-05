@@ -8,6 +8,7 @@ import { PostDetails } from "../components/PostDetails.jsx/PostDetails"
 
 
 
+
 export const ApplicationViews = () => {
     const [currentUser, setCurrentUser] = useState({})
 
@@ -41,6 +42,9 @@ export const ApplicationViews = () => {
                 <Route path="profile">
                     <Route index element={<Profile currentUser={currentUser} />} />
                 </Route>
+                {/* <Route path="progress">
+                    <Route index element={<Progress currentUser={currentUser} />} />
+                </Route> */}
             </Route>
         </Routes>
     )

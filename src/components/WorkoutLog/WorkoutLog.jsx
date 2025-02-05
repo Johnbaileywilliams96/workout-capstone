@@ -207,7 +207,7 @@ export const WorkoutLog = ({ currentUser }) => {
         <h2 className="workout-h2">Log Workout</h2>
         <fieldset className="users-workout">
           <div>
-            <label>Workout Name</label>
+            <label>Workout Name:</label>
             <input
               type="text"
               name="Workout-Name"
@@ -262,7 +262,7 @@ export const WorkoutLog = ({ currentUser }) => {
 
           <fieldset className="users-reps">
             <div>
-              <label>Reps</label>
+              <label>Reps:</label>
               <div className="reps-counter">
                 <button type="button" onClick={decrementReps}>
                   -

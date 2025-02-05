@@ -19,6 +19,7 @@ import { updateMuscleGroup } from "../services/muscleGroupService";
 import { getExercises } from "../services/exerciseService";
 import { updateWorkout } from "../services/postService";
 
+
 export const PostDetails = ({ currentUser }) => {
   const { postId } = useParams();
   const [post, setPost] = useState({});
@@ -42,6 +43,7 @@ export const PostDetails = ({ currentUser }) => {
   });
   const [grossWeight, setGrossWeight] = useState(0);
   const [grossReps, setGrossReps] = useState(0);
+  const [heaviestWeight, setHeaviestWeight] = useState(0)
 
   const hasUserLiked = postLikes.some((like) => like.userId === currentUser.id);
   const isPostOwner = post.userId === currentUser.id;
@@ -57,6 +59,26 @@ export const PostDetails = ({ currentUser }) => {
   const getWorkoutDetails = (workoutId) => {
     return workouts.find((w) => w.id === workoutId);
   };
+
+  const getHeaviestWeight = (workoutId) => {
+    if (!sets.length || !workoutId) return 0;
+  
+    const workoutExercisesForWorkout = workoutExercises.filter(
+      we => we.workoutId === workoutId
+    );
+  
+    const heaviestWeight = workoutExercisesForWorkout.reduce((maxWeight, workoutExercise) => {
+      const exerciseSets = sets.filter(set => set.workoutExerciseId === workoutExercise.id);
+      const exerciseMaxWeight = Math.max(
+        ...exerciseSets.map(set => set.weight || 0)
+      );
+      return Math.max(maxWeight, exerciseMaxWeight);
+    }, 0);
+    
+    setHeaviestWeight(heaviestWeight);
+    return heaviestWeight;
+  };
+
 
   const getTotalRepsCount = (workoutId) => {
     if (!sets.length || !workoutId) return 0;
@@ -77,13 +99,11 @@ export const PostDetails = ({ currentUser }) => {
 
   const getTotalWorkoutWeight = (workoutId) => {
     if (!sets.length || !workoutId) return 0;
-    
-    // First get all workoutExercises for this workout
+
     const workoutExercisesForWorkout = workoutExercises.filter(
       we => we.workoutId === workoutId
     );
     
-    // Then get all sets that belong to these workoutExercises
     const totalWeight = workoutExercisesForWorkout.reduce((total, workoutExercise) => {
       const exerciseSets = sets.filter(set => set.workoutExerciseId === workoutExercise.id);
       const exerciseWeight = exerciseSets.reduce((setTotal, set) => setTotal + (set.weight || 0), 0);
@@ -334,9 +354,8 @@ export const PostDetails = ({ currentUser }) => {
         setEditedPost(singlePost);
         if (sets.length && singlePost.workoutId) {
           getTotalWorkoutWeight(singlePost.workoutId);
-        }
-        if (sets.length && singlePost.workoutId) {
           getTotalRepsCount(singlePost.workoutId);
+          getHeaviestWeight(singlePost.workoutId); 
         }
       }
     });
@@ -522,8 +541,14 @@ export const PostDetails = ({ currentUser }) => {
                 Total Reps: {grossReps} 
               </div>
             )}
+            {heaviestWeight && (
+              <div className="gross-weight">
+                Heaviest Weight Lifted: {heaviestWeight} 
               </div>
             )}
+              </div>
+            )}
+            
 
 
             <div>

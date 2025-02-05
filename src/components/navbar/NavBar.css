@@ -12,6 +12,28 @@ li {
 }
 
 .navbar-link {
+    color: #333;
     text-decoration: none;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.navbar-link:hover {
     color: black;
+    transform: translateY(-2px);
+}
+
+.navbar-link::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: -4px;
+    left: 0;
+    background-color: black;
+    transition: width 0.3s ease;
+}
+
+.navbar-link:hover::after {
+    width: 100%;
 }
