@@ -18,7 +18,9 @@
     flex-direction: column;
     align-items: center;
     margin: 10px 0;
-  }
+    border: 2px dashed #808080;
+    padding: 15px;
+}
   
   .sets-list {
     width: 100%;
@@ -87,3 +89,14 @@
 
     border-radius: 4px;
   }
+
+
+  .gross-weight {
+    margin-top: 1rem;
+    padding: 1rem;
+    background-color: #000000;
+    border-radius: 4px;
+    margin-left: auto;
+    margin-right: auto;
+    
+}

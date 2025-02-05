@@ -40,6 +40,7 @@ export const PostDetails = ({ currentUser }) => {
     muscleGroupId: null,
     dateCompleted: "",
   });
+  const [grossWeight, setGrossWeight] = useState(0);
 
   const hasUserLiked = postLikes.some((like) => like.userId === currentUser.id);
   const isPostOwner = post.userId === currentUser.id;
@@ -54,6 +55,25 @@ export const PostDetails = ({ currentUser }) => {
 
   const getWorkoutDetails = (workoutId) => {
     return workouts.find((w) => w.id === workoutId);
+  };
+
+  const getTotalWorkoutWeight = (workoutId) => {
+    if (!sets.length || !workoutId) return 0;
+    
+    // First get all workoutExercises for this workout
+    const workoutExercisesForWorkout = workoutExercises.filter(
+      we => we.workoutId === workoutId
+    );
+    
+    // Then get all sets that belong to these workoutExercises
+    const totalWeight = workoutExercisesForWorkout.reduce((total, workoutExercise) => {
+      const exerciseSets = sets.filter(set => set.workoutExerciseId === workoutExercise.id);
+      const exerciseWeight = exerciseSets.reduce((setTotal, set) => setTotal + (set.weight || 0), 0);
+      return total + exerciseWeight;
+    }, 0);
+    
+    setGrossWeight(totalWeight);
+    return totalWeight;
   };
 
   const getExerciseName = (exerciseId) => {
@@ -294,9 +314,12 @@ export const PostDetails = ({ currentUser }) => {
       if (singlePost) {
         setPost(singlePost);
         setEditedPost(singlePost);
+        if (sets.length && singlePost.workoutId) {
+          getTotalWorkoutWeight(singlePost.workoutId);
+        }
       }
     });
-  }, [postId]);
+  }, [postId, sets, workoutExercises]);
 
   const handleDeletePost = async (postId) => {
     try {
@@ -468,8 +491,14 @@ export const PostDetails = ({ currentUser }) => {
                     </div>
                   );
                 })}
+            {grossWeight && (
+              <div className="gross-weight">
+                Total Weight: {grossWeight} lbs
               </div>
             )}
+              </div>
+            )}
+
 
             <div>
               <span className="post-info">Likes: </span>
