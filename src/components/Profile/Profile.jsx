@@ -224,6 +224,12 @@ export const Profile = ({ currentUser }) => {
             </div>
           ))}
         </div>
+
+          <div className="progress-section">
+            <h3>Progress</h3>
+
+          </div>
+
       </div>
     </div>
   );

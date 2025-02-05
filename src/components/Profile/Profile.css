@@ -34,14 +34,14 @@
     color: #333;
   }
   
-  .Workouts-section, .Likes-section {
+  .Workouts-section, .Likes-section, .progress-section {
     background: white;
     border-radius: 8px;
     padding: 1.5rem;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   }
   
-  .Workouts-section h3, .Likes-section h3 {
+  .Workouts-section h3, .Likes-section h3, .progress-section {
     color: #333;
     margin-bottom: 1rem;
     font-size: 1.5rem;
@@ -77,7 +77,7 @@
       grid-template-columns: 1fr;
     }
   
-    .Profile-item, .Workouts-section, .Likes-section {
+    .Profile-item, .Workouts-section, .Likes-section, .progress-section {
       padding: 1rem;
     }
   }

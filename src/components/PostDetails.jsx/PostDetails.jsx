@@ -407,7 +407,7 @@ export const PostDetails = ({ currentUser }) => {
                         {getSetsByWorkoutExercise(workoutExercise.id).map(
                           (set) => (
                             <div key={set.id} className="set-details">
-                              <span>Set {set.setOrder}: </span>
+                              <span>Set: {set.setOrder} </span>
                               <input
                                 type="number"
                                 value={
