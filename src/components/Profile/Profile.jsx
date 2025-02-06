@@ -342,25 +342,27 @@ export const Profile = ({ currentUser }) => {
         <div className="progress-section">
           <h3>Progress</h3>
           <div className="workout-progress">
-            {userWorkouts.map((workout) => (
-              <div key={workout.id} className="workout-progress-item">
-                <h4>{workout.title}</h4>
-              
-                {workoutStats[workout.id] && (
-                  <>
-                    <p>
-                      Total Weight: {workoutStats[workout.id].totalWeight} lbs
-                    </p>
-                    <p>Total Reps: {workoutStats[workout.id].totalReps}</p>
-                    <p>
-                      Heaviest Weight: {workoutStats[workout.id].heaviestWeight}{" "}
-                      lbs
-                    </p>
-                    <p>Total Reps: {workoutStats[workout.id].totalReps}</p>
-                  </>
-                )}
-              </div>
-            ))}
+            {userWorkouts.length === 0 ? (
+              <p>No workouts available</p>
+            ) : (
+              userWorkouts.map((workout) => (
+                <div key={workout.id} className="workout-progress-item">
+                  <h4>{workout.title}</h4>
+                  {workoutStats[workout.id] && (
+                    <>
+                      <p>
+                        Total Weight: {workoutStats[workout.id].totalWeight} lbs
+                      </p>
+                      <p>Total Reps: {workoutStats[workout.id].totalReps}</p>
+                      <p>
+                        Heaviest Weight:{" "}
+                        {workoutStats[workout.id].heaviestWeight} lbs
+                      </p>
+                    </>
+                  )}
+                </div>
+              ))
+            )}
           </div>
         </div>
       </div>
