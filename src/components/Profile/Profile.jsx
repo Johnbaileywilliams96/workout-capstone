@@ -4,12 +4,12 @@ import { getUser } from "../services/userService";
 import { getWorkout } from "../services/getWorkout";
 import { getLikes } from "../services/likesService";
 import { deleteMyWorkouts, updateWorkout } from "../services/postService";
-import { Link, useParams } from "react-router-dom";
+// import { Link, useParams } from "react-router-dom";
 import { getWorkoutExercises } from "../services/getWorkout";
 import { getSets } from "../services/setsService";
 
 export const Profile = ({ currentUser }) => {
-  const { postId } = useParams();
+  // const { postId } = useParams();
   const [allUsers, setAllUsers] = useState([]);
   const [cUser, setCUser] = useState([]);
   const [userWorkouts, setUserWorkouts] = useState([]);
@@ -21,9 +21,98 @@ export const Profile = ({ currentUser }) => {
     muscleGroupId: null,
     dateCompleted: "",
   });
-  // const [post, setPost] = useState({});
-  // const [workoutExercises, setWorkoutExercises] = useState([]);
-  // const [sets, setSets] = useState([]);
+  const [post, setAllPosts] = useState({});
+  const [workoutExercises, setWorkoutExercises] = useState(0);
+  const [sets, setSets] = useState(0);
+  const [workoutStats, setWorkoutStats] = useState({});
+
+  const isPostOwner = post.userId === currentUser.id;
+
+  const fetchAllPosts = async () => {
+    try {
+      const postsArray = await getPosts();
+      setAllPosts(postsArray);
+    } catch (error) {
+      console.error("Error fetching posts:", error);
+    }
+  };
+
+  useEffect(() => {
+    const fetchSets = async () => {
+      try {
+        const setsData = await getSets();
+        setSets(setsData);
+      } catch (error) {
+        console.error("Error fetching sets:", error);
+      }
+    };
+    fetchSets();
+  }, []);
+
+  useEffect(() => {
+    const fetchWorkoutExercises = async () => {
+      try {
+        const workoutExerciseData = await getWorkoutExercises();
+        setWorkoutExercises(workoutExerciseData);
+      } catch (error) {
+        console.error("Error fetching workoutExercises:", error);
+      }
+    };
+    fetchWorkoutExercises();
+  }, []);
+
+  const calculateTotalStats = async (workoutId) => {
+    const workoutExercisesForWorkout = workoutExercises.filter(
+      (we) => we.workoutId === workoutId
+    );
+
+    const totalWeight = workoutExercisesForWorkout.reduce(
+      (total, workoutExercise) => {
+        const exerciseSets = sets.filter(
+          (set) => set.workoutExerciseId === workoutExercise.id
+        );
+        const exerciseWeight = exerciseSets.reduce(
+          (setTotal, set) => setTotal + (set.weight || 0),
+          0
+        );
+        return total + exerciseWeight;
+      },
+      0
+    );
+
+    const totalReps = workoutExercisesForWorkout.reduce(
+      (total, workoutExercise) => {
+        const exerciseSets = sets.filter(
+          (set) => set.workoutExerciseId === workoutExercise.id
+        );
+        const exerciseReps = exerciseSets.reduce(
+          (setTotal, set) => setTotal + (set.reps || 0),
+          0
+        );
+        return total + exerciseReps;
+      },
+      0
+    );
+
+    const heaviestWeight = workoutExercisesForWorkout.reduce(
+      (maxWeight, workoutExercise) => {
+        const exerciseSets = sets.filter(
+          (set) => set.workoutExerciseId === workoutExercise.id
+        );
+        const exerciseMaxWeight = Math.max(
+          ...exerciseSets.map((set) => set.weight || 0)
+        );
+        return Math.max(maxWeight, exerciseMaxWeight);
+      },
+      0
+    );
+
+    return {
+      totalWeight,
+      totalReps,
+      heaviestWeight,
+    };
+  };
 
   const fetchAllUsersWorkouts = async () => {
     try {
@@ -33,8 +122,6 @@ export const Profile = ({ currentUser }) => {
       const workoutArray = await getWorkout();
 
       const likesArray = await getLikes();
-      // const workoutExercisesArray = await getWorkoutExercises()
-      // const setsArray = await getSets()
 
       const currentUserLikes = likesArray
         .filter((like) => like.userId === currentUser.id)
@@ -141,6 +228,23 @@ export const Profile = ({ currentUser }) => {
       console.error("Error deleting post:", error);
     }
   };
+  useEffect(() => {
+    const loadStats = async () => {
+      const stats = {};
+      for (const workout of userWorkouts) {
+        stats[workout.id] = await calculateTotalStats(workout.id);
+      }
+      setWorkoutStats(stats);
+    };
+
+    if (
+      userWorkouts.length > 0 &&
+      workoutExercises.length > 0 &&
+      sets.length > 0
+    ) {
+      loadStats();
+    }
+  }, [userWorkouts, workoutExercises, sets]);
 
   useEffect(() => {
     fetchAllUsersWorkouts();
@@ -237,6 +341,27 @@ export const Profile = ({ currentUser }) => {
 
         <div className="progress-section">
           <h3>Progress</h3>
+          <div className="workout-progress">
+            {userWorkouts.map((workout) => (
+              <div key={workout.id} className="workout-progress-item">
+                <h4>{workout.title}</h4>
+              
+                {workoutStats[workout.id] && (
+                  <>
+                    <p>
+                      Total Weight: {workoutStats[workout.id].totalWeight} lbs
+                    </p>
+                    <p>Total Reps: {workoutStats[workout.id].totalReps}</p>
+                    <p>
+                      Heaviest Weight: {workoutStats[workout.id].heaviestWeight}{" "}
+                      lbs
+                    </p>
+                    <p>Total Reps: {workoutStats[workout.id].totalReps}</p>
+                  </>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>

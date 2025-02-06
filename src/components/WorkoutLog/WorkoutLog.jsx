@@ -71,9 +71,13 @@ export const WorkoutLog = ({ currentUser }) => {
 
   const handleExerciseChange = (event) => {
     const exerciseId = parseInt(event.target.value);
-    const selected = exercises.find(exercise => exercise.id === exerciseId)
-    setSelectedDescription(selected?.description || "")
-    setSelectedExercise(event.target.value);
+    const selected = exercises.find(exercise => exercise.id === exerciseId);
+    
+    // Compare with selectedMuscleGroup instead of muscleGroup.id
+    if (selected.muscleGroupId === parseInt(selectedMuscleGroup)) {
+      setSelectedDescription(selected?.description || "");
+      setSelectedExercise(event.target.value);
+    }
   };
 
   const incrementReps = () => {
@@ -239,17 +243,19 @@ export const WorkoutLog = ({ currentUser }) => {
 
         <div className="exercise-selection">
           <div className="exercise-dropdown">
-            <select
+          <select
               id="exercise-group"
               value={selectedExercise}
               onChange={handleExerciseChange}
             >
               <option value="0">Exercises</option>
-              {exercises.map((exercise) => (
-                <option value={exercise.id} key={exercise.id}>
-                  {exercise.name}
-                </option>
-              ))}
+              {exercises
+                .filter(exercise => selectedMuscleGroup !== "0" && exercise.muscleGroupId === parseInt(selectedMuscleGroup))
+                .map((exercise) => (
+                  <option value={exercise.id} key={exercise.id}>
+                    {exercise.name}
+                  </option>
+                ))}
             </select>
           </div>
           {selectedDescription && (

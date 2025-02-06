@@ -513,7 +513,7 @@ export const PostDetails = ({ currentUser }) => {
 
                   return (
                     <div key={exerciseId} className="exercise-details">
-                      <h5>{getExerciseName(exerciseId)}</h5>
+                      <h5>{getExerciseName(exerciseId)}:</h5>
                       <div className="sets-list">
                         {workoutExercisesForThisExercise.flatMap(
                           (workoutExercise) =>
