@@ -19,6 +19,7 @@ Workout Log streamlines fitness tracking by focusing on core functionality. Unli
 - Simple workout logging
 - Personal record tracking 
 - Social comparison features
+- Detailed exercise descriptions
 
 This focused approach helps users maintain clear fitness objectives without distractions.
 
@@ -40,19 +41,24 @@ This focused approach helps users maintain clear fitness objectives without dist
 - Track liked workouts
 - Monitor progress with:
   - Personal records by exercise
-  - Total rep counts 
+  - Total rep counts
+  - Heaviest weight lifted
 
 # Development
 
 Built with:
 - Frontend: JavaScript/React
-- Backend: Local server
+- Backend: Local server (json)
 
 ## Architecture
 - App.jsx: Handles authentication (login/register)
 - ApplicationViews: Central routing hub
  - Manages user permissions via currentUser prop
  - Controls access to edit/delete functionality
+- NavBar: handles routes for (Community Feed, workout Log, profile and logout)
+- Services: Fetches data from database 
+- WorkoutLog: Handles data input for the workout.
+- PostDetails: Page that allows users to view entire workout as well as edit their workout.
 
 
 # Challenges
@@ -60,4 +66,5 @@ Built with:
 Key technical hurdles:
 - Maintaining data consistency across updates and deletions
 - Managing complex data relationships between tables
-- Cascading deletions for related records (e.g., workout-exercise join tables) 
+- Cascading deletions for related records (e.g., workout-exercise join tables)
+- Overall consistency with naming conventions and organization.  
