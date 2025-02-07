@@ -73,7 +73,7 @@ export const WorkoutLog = ({ currentUser }) => {
     const exerciseId = parseInt(event.target.value);
     const selected = exercises.find(exercise => exercise.id === exerciseId);
     
-    // Compare with selectedMuscleGroup instead of muscleGroup.id
+   
     if (selected.muscleGroupId === parseInt(selectedMuscleGroup)) {
       setSelectedDescription(selected?.description || "");
       setSelectedExercise(event.target.value);

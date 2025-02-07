@@ -4,12 +4,10 @@ import { getUser } from "../services/userService";
 import { getWorkout } from "../services/getWorkout";
 import { getLikes } from "../services/likesService";
 import { deleteMyWorkouts, updateWorkout } from "../services/postService";
-// import { Link, useParams } from "react-router-dom";
 import { getWorkoutExercises } from "../services/getWorkout";
 import { getSets } from "../services/setsService";
 
 export const Profile = ({ currentUser }) => {
-  // const { postId } = useParams();
   const [allUsers, setAllUsers] = useState([]);
   const [cUser, setCUser] = useState([]);
   const [userWorkouts, setUserWorkouts] = useState([]);
