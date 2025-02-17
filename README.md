@@ -47,7 +47,7 @@ This focused approach helps users maintain clear fitness objectives without dist
 # Development
 
 Built with:
-- Frontend: JavaScript/React
+- ClientSide: JavaScript/React
 - Backend: Local server (json)
 
 ## Architecture
@@ -68,3 +68,7 @@ Key technical hurdles:
 - Managing complex data relationships between tables
 - Cascading deletions for related records (e.g., workout-exercise join tables)
 - Overall consistency with naming conventions and organization.  
+
+# ERD 
+
+![Project Screenshot](./images/erd-screenshot.png)
